@@ -43,10 +43,8 @@ services:
       database:
         condition: service_healthy
     env_file:
-      - path: .env
-        required: true
-      - path: .env.local
-        required: true
+      - .env
+      - .env.local
     restart: unless-stopped
   
   database:
@@ -68,10 +66,8 @@ services:
         timeout: 5s
         retries: 10
     env_file:
-      - path: .env
-        required: true
-      - path: .env.local
-        required: true
+      - .env
+      - .env.local
 
 volumes:
   node_modules:
