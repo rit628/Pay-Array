@@ -31,8 +31,10 @@ jobs:
       
       - name: Run Tests
         run: |
-          docker exec app_backend pytest
-          docker exec app_frontend pnpm run test run
+          BACKEND_CONTAINER=`grep BACKEND_CONTAINER_NAME .env | cut -d '=' -f 2`
+          FRONTEND_CONTAINER=`grep FRONTEND_CONTAINER_NAME .env | cut -d '=' -f 2`
+          docker exec $BACKEND_CONTAINER pytest
+          docker exec $FRONTEND_CONTAINER pnpm run test run
       
       - name: Shut Down Containers
         run: docker compose down
