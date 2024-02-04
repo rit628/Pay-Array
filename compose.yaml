@@ -1,0 +1,74 @@
+version: '3'
+
+services:
+  frontend:
+    container_name: ${FRONTEND_CONTAINER_NAME}
+    build: 
+      context: .
+      dockerfile: ./.docker/frontend/Dockerfile
+      args:
+        - WORKDIR=${FRONTEND_WORKDIR}
+    image: ${FRONTEND_CONTAINER_NAME}:development
+    volumes:
+      - ./frontend/:${FRONTEND_WORKDIR}
+      - node_modules:${FRONTEND_WORKDIR}/node_modules/
+    expose:
+      - ${FRONTEND_CONTAINER_PORT}
+    ports:
+      - ${FRONTEND_HOST_PORT}:${FRONTEND_CONTAINER_PORT}
+    command: [ "pnpm", "run", "dev", "-p", "${FRONTEND_CONTAINER_PORT}"]
+    depends_on:
+      - backend
+    env_file:
+      - .env
+      - .env.local
+    restart: unless-stopped
+
+  backend:
+    container_name: ${BACKEND_CONTAINER_NAME}
+    build: 
+      context: .
+      dockerfile: ./.docker/backend/Dockerfile
+      args:
+        - WORKDIR=${BACKEND_WORKDIR}
+    image: ${BACKEND_CONTAINER_NAME}:development
+    volumes:
+      - ./backend/src/:${BACKEND_WORKDIR}
+    expose:
+      - ${BACKEND_CONTAINER_PORT}
+    ports:
+      - ${BACKEND_HOST_PORT}:${BACKEND_CONTAINER_PORT}
+    command: [ "flask", "--app", "server", "run", "--host=0.0.0.0", "--port=${BACKEND_CONTAINER_PORT}", "--debug" ]
+    depends_on:
+      database:
+        condition: service_healthy
+    env_file:
+      - .env
+      - .env.local
+    restart: unless-stopped
+  
+  database:
+    container_name: ${DATABASE_CONTAINER_NAME}
+    build: 
+      context: .
+      dockerfile: ./.docker/database/Dockerfile
+      args:
+        - DATABASE_NAME=${DATABASE_NAME}
+    image: ${DATABASE_CONTAINER_NAME}:development
+    volumes:
+      - database_data:/var/lib/mysql/
+    expose:
+      - ${DATABASE_CONTAINER_PORT}
+    environment:
+      - MYSQL_TCP_PORT=${DATABASE_CONTAINER_PORT}
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        timeout: 5s
+        retries: 10
+    env_file:
+      - .env
+      - .env.local
+
+volumes:
+  node_modules:
+  database_data:

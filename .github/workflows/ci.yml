@@ -1,0 +1,40 @@
+name: Integration Test
+
+on:
+  push:
+    branches:
+      - "*"
+      - '*/*'
+      - '**'
+      - '!main'
+  pull_request:
+    branches:
+      - "*"
+      - '*/*'
+      - '**'
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Add Secrets to .env.local
+        run: |
+          touch .env.local
+          echo MYSQL_ROOT_PASSWORD=${{secrets.MYSQL_ROOT_PASSWORD}} > .env.local
+
+      - name: Build Containers
+        run: docker compose up -d
+      
+      - name: Run Tests
+        run: |
+          BACKEND_CONTAINER=`grep BACKEND_CONTAINER_NAME .env | cut -d '=' -f 2`
+          FRONTEND_CONTAINER=`grep FRONTEND_CONTAINER_NAME .env | cut -d '=' -f 2`
+          docker exec $BACKEND_CONTAINER pytest
+          docker exec $FRONTEND_CONTAINER pnpm run test run
+      
+      - name: Shut Down Containers
+        run: docker compose down
