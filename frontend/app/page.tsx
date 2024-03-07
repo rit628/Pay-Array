@@ -1,3 +1,4 @@
+/*
 import Image from "next/image";
 
 export default function Home() {
@@ -111,3 +112,48 @@ export default function Home() {
     </main>
   );
 }
+*/
+import React from 'react';
+
+const Home = () => {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded shadow-md w-96">
+        <h2 className="text-2xl font-semibold mb-6 text-center">Login</h2>
+
+        <div className="mb-4">
+          <label htmlFor="username" className="block text-gray-600 font-medium mb-2">
+            Username:
+          </label>
+          <input
+            type="text"
+            id="username"
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none"
+            required
+          />
+        </div>
+
+        <div className="mb-6">
+          <label htmlFor="password" className="block text-gray-600 font-medium mb-2">
+            Password:
+          </label>
+          <input
+            type="password"
+            id="password"
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 focus:outline-none"
+        >
+          Login
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Home;
