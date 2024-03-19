@@ -53,7 +53,8 @@ services:
       context: .
       dockerfile: ./.docker/database/Dockerfile
       args:
-        - DATABASE_NAME=${DATABASE_NAME}
+        - DATABASE_NAME_PRODUCTION=${DATABASE_NAME_PRODUCTION}
+        - DATABASE_NAME_TEST=${DATABASE_NAME_TEST}
     image: ${DATABASE_CONTAINER_NAME}:development
     volumes:
       - database_data:/var/lib/mysql/
