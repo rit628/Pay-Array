@@ -7,7 +7,7 @@ from .auth import *
 from .orm import db, orm_object_to_dict, User, Item 
 
 def create_app(name=__name__, testing=False):
-    JWT_HEADER_KEY = os.environ.get("JSON_WEB_TOKEN_HEADER_KEY")
+    AUTH_TYPE = os.environ.get("AUTH_TYPE")
     API_VERSION = os.environ.get("API_VERSION")
     API_ROOT_PATH = f"/api/{API_VERSION}"
 
@@ -29,10 +29,11 @@ def create_app(name=__name__, testing=False):
     db.init_app(app)        
 
     def get_auth_token() -> str:
-        if JWT_HEADER_KEY not in request.headers:
-            return "Missing token.", 401
-        token = request.headers.get(JWT_HEADER_KEY)
-        return token
+        if request.authorization is None:
+            raise AuthenticationError("Missing Token.")
+        if request.authorization.type.capitalize() != AUTH_TYPE:
+            raise AuthenticationError("Invalid Authorization Header.")
+        return request.authorization.token
 
     @app.errorhandler(InvalidFieldError)
     def handle_invalid_field_error(error):
@@ -66,7 +67,8 @@ def create_app(name=__name__, testing=False):
         if user is None:    # guard if user is not found
             return jsonify(f"No Account with Username: {username}."), 404
         token = authenticate_user(user, password)
-        return jsonify(token), 201
+        response = f"{AUTH_TYPE} {token}"
+        return jsonify(response), 201
 
     @app.route(f"{API_ROOT_PATH}/logout", methods=["DELETE"])
     def logout():

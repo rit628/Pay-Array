@@ -1,4 +1,6 @@
+import os
 from ..auth import decode_token
+AUTH_TYPE = os.environ.get("AUTH_TYPE")
 
 def test_user_creation_success(client):
     response = client.post("/api/v1/users", json={
@@ -116,8 +118,12 @@ def test_user_login_success(client):
         "password" : "terrible_password"
     })
 
+
     assert response.status_code == 201
-    assert decode_token(response.get_json())["user_id"] == 1
+
+    auth_type, token = response.get_json().split()
+    assert auth_type == AUTH_TYPE
+    assert decode_token(token)["user_id"] == 1
 
 def test_user_login_incorrect_password(client):
     # creates user
