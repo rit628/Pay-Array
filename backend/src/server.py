@@ -6,6 +6,7 @@ import re
 from .auth import *
 from .orm import db, User, Item
 from sqlalchemy.exc import IntegrityError
+from werkzeug.exceptions import NotFound
 
 def create_app(name=__name__, testing=False):
     dupe_error_msg = re.compile(R"Duplicate entry \'([^\']*)\'")
@@ -83,10 +84,16 @@ def create_app(name=__name__, testing=False):
             response = jsonify(f"{username} is already taken.")
         elif non_nullable_error_match:
             field = non_nullable_error_match.group(1)
-            response = jsonify(f"{field} cannot be deleted.")
+            response = jsonify(f"User's {field} cannot be deleted.")
         else:
             response = jsonify(error_msg)
         response.status_code = 400
+        return response
+    
+    @app.errorhandler(NotFound)
+    def handle_notfound_error(error):
+        response = jsonify(error.description)
+        response.status_code = 404
         return response
 
     @app.route("/validate-server-runtime/", methods=["GET"])
