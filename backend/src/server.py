@@ -155,11 +155,11 @@ def create_app(name=__name__, testing=False):
             for field, value in data.items():
                 user.set_attr(field, value)
             db.session.commit()
-            return jsonify("User Updated Successfully"), 200
+            return jsonify("User Updated Successfully."), 200
         elif request.method == "DELETE":
             db.session.delete(user)
             db.session.commit()
-            return jsonify("User Deleted Successfully"), 200
+            return jsonify("User Deleted Successfully."), 200
             
     
     @app.route(f"{API_ROOT_PATH}/users/me/<resource>/", methods=["GET", "POST", "DELETE"])
