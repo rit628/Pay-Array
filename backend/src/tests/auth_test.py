@@ -1,9 +1,11 @@
 import os
 from ..auth import decode_token
 AUTH_TYPE = os.environ.get("AUTH_TYPE")
+API_VERSION = os.environ.get("API_VERSION")
+API_ROOT_PATH = f"/api/{API_VERSION}"
 
 def test_user_creation_success(client):
-    response = client.post("/api/v1/users", json={
+    response = client.post(f"{API_ROOT_PATH}/users/", json={
         "username" : "testUser999",
         "first_name" : "Test",
         "last_name" : "User",
@@ -16,7 +18,7 @@ def test_user_creation_success(client):
     assert response.get_json() == "User Created Successfully."
 
 def test_user_creation_no_password(client):
-    response = client.post("/api/v1/users", json={
+    response = client.post(f"{API_ROOT_PATH}/users/", json={
         "username" : "testUser999",
         "first_name" : "Test",
         "last_name" : "User",
@@ -28,7 +30,7 @@ def test_user_creation_no_password(client):
     assert response.get_json() == "No Password Provided."
 
 def test_user_creation_invalid_email(client):
-    response = client.post("/api/v1/users", json={
+    response = client.post(f"{API_ROOT_PATH}/users/", json={
         "username" : "testUser999",
         "first_name" : "Test",
         "last_name" : "User",
@@ -41,7 +43,7 @@ def test_user_creation_invalid_email(client):
     assert response.get_json() == "Invalid email."
 
 def test_user_creation_invalid_name(client):
-    response = client.post("/api/v1/users", json={
+    response = client.post(f"{API_ROOT_PATH}/users/", json={
         "username" : "testUser999",
         "first_name" : "Test1",
         "last_name" : "User",
@@ -54,7 +56,7 @@ def test_user_creation_invalid_name(client):
     assert response.get_json() == "Invalid first_name."
 
 def test_user_creation_invalid_username(client):
-    response = client.post("/api/v1/users", json={
+    response = client.post(f"{API_ROOT_PATH}/users/", json={
         "username" : "testUser 999",
         "first_name" : "Test",
         "last_name" : "User",
@@ -67,7 +69,7 @@ def test_user_creation_invalid_username(client):
     assert response.get_json() == "Invalid username."
 
 def test_user_creation_invalid_phone_number(client):
-    response = client.post("/api/v1/users", json={
+    response = client.post(f"{API_ROOT_PATH}/users/", json={
         "username" : "testUser999",
         "first_name" : "Test",
         "last_name" : "User",
@@ -81,7 +83,7 @@ def test_user_creation_invalid_phone_number(client):
 
 def test_user_creation_duplicate(client):
     # creates user initially
-    client.post("/api/v1/users", json={
+    client.post(f"{API_ROOT_PATH}/users/", json={
         "username" : "testUser999",
         "first_name" : "Test",
         "last_name" : "User",
@@ -91,7 +93,7 @@ def test_user_creation_duplicate(client):
     })
 
     # attempts to create new user with same username
-    response = client.post("/api/v1/users", json={
+    response = client.post(f"{API_ROOT_PATH}/users/", json={
         "username" : "testUser999",
         "first_name" : "Test",
         "last_name" : "User",
@@ -104,7 +106,7 @@ def test_user_creation_duplicate(client):
     assert response.get_json() == "testUser999 is already taken."
 
 def test_user_login_success(client):
-    response = client.post("/api/v1/users", json={
+    response = client.post(f"{API_ROOT_PATH}/users/", json={
         "username" : "testUser999",
         "first_name" : "Test",
         "last_name" : "User",
@@ -113,7 +115,7 @@ def test_user_login_success(client):
         "password" : "terrible_password"
     })
 
-    response = client.post("/api/v1/login", json={
+    response = client.post(f"{API_ROOT_PATH}/login/", json={
         "username" : "testUser999",
         "password" : "terrible_password"
     })
@@ -127,7 +129,7 @@ def test_user_login_success(client):
 
 def test_user_login_incorrect_password(client):
     # creates user
-    client.post("/api/v1/users", json={
+    client.post(f"{API_ROOT_PATH}/users/", json={
         "username" : "testUser999",
         "first_name" : "Test",
         "last_name" : "User",
@@ -137,7 +139,7 @@ def test_user_login_incorrect_password(client):
     })
 
     # Login to created user
-    response = client.post("/api/v1/login", json={
+    response = client.post(f"{API_ROOT_PATH}/login/", json={
         "username" : "testUser999",
         "password" : "wrong_password"
     })
@@ -146,7 +148,7 @@ def test_user_login_incorrect_password(client):
     assert response.get_json() == "Incorrect Password."
 
 def test_user_login_invalid_username(client):
-    response = client.post("/api/v1/login", json={
+    response = client.post(f"{API_ROOT_PATH}/login/", json={
         "username" : "nonexistentUser",
         "password" : "terrible_password"
     })
