@@ -4,7 +4,6 @@ import sqlalchemy as sql
 import os
 from .auth import *
 from .orm import db, orm_object_to_dict, User, Item 
-from werkzeug.exceptions import NotFound
 
 def create_app(name=__name__, testing=False):
     AUTH_TYPE = os.environ.get("AUTH_TYPE")
@@ -126,25 +125,41 @@ def create_app(name=__name__, testing=False):
         db.session.commit()
         return jsonify("User Created Successfully."), 201
     
-    @app.route(f"{API_ROOT_PATH}/users/me/", methods=["GET", "DELETE"])
+    @app.route(f"{API_ROOT_PATH}/users/me/", methods=["GET", "POST", "DELETE"])
     def user_access():
         user = get_request_user()
         if request.method == "GET":
             user_dict = orm_object_to_dict(user)
             return jsonify(user_dict), 200
+        elif request.method == "POST":
+            data = request.get_json()
+            validate_user_data(data)
+            for field, value in data.items():
+                user.set_attr(field, value)
+            db.session.commit()
+            return jsonify("User Updated Successfully"), 200
         elif request.method == "DELETE":
             db.session.delete(user)
             db.session.commit()
             return jsonify("User Deleted Successfully"), 200
+            
     
-    @app.route(f"{API_ROOT_PATH}/users/me/<resource>/", methods=["GET"])
-    def user_get(resource:str):
+    @app.route(f"{API_ROOT_PATH}/users/me/<resource>/", methods=["GET", "POST", "DELETE"])
+    def user_resource_access(resource:str):
         user = get_request_user()
-        user_dict = orm_object_to_dict(user)
-        if resource not in user_dict:
-            raise NotFound("Requested resource does not exist.")
-        fetched_resource = orm_object_to_dict(user)[resource]
-        return jsonify(fetched_resource), 200
+        if request.method == "GET":
+            fetched_resource = user.get_attr(resource)
+            return jsonify(fetched_resource), 200
+        elif request.method == "POST":
+            data = request.get_json()
+            validate_user_data(data)
+            user.set_attr(resource, data[resource])
+            db.session.commit()
+            return jsonify(f"User's {resource} Updated Successfully."), 200
+        elif request.method == "DELETE":
+            user.set_attr(resource, None)
+            db.session.commit()
+            return jsonify(f"User's {resource} Deleted Successfully."), 200
     
     @app.route("/debug/", methods=["GET"])
     def debug():
