@@ -129,3 +129,5 @@ def decode_token(token:str, jwt_encoding_algorithm:str = JWT_ENCODING_ALGORITHM)
         return payload
     except jwt.ExpiredSignatureError: # token has expired
         raise AuthenticationError("Expired Token.")
+    except jwt.InvalidTokenError:
+        raise AuthenticationError("Invalid Token.")
