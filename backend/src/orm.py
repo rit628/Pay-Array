@@ -1,8 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy
 
+PRIVATE_FIELDS = {"id", "salt", "password_hash"}
+
 def orm_object_to_dict(obj) -> dict:
     dict_rep = dict()
     for field in obj.__table__.c:
+        if field.name in PRIVATE_FIELDS:
+            continue
         attr = getattr(obj, field.name)
         attr = str(attr) if type(attr) is bytearray else attr
         dict_rep.update({field.name : attr})
