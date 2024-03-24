@@ -1,30 +1,33 @@
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.exceptions import NotFound, MethodNotAllowed
-
-PRIVATE_FIELDS = {"id", "salt", "password_hash"}
+from werkzeug.exceptions import NotFound
 
 db = SQLAlchemy()
+
+PRIVATE_FIELDS = {"user": {"id", "salt", "password_hash"},
+                  "item": {"id"}
+                }
 
 class Base(db.Model):
     __abstract__ = True
     def get_attr(self, attr):
         try:
+            if attr in PRIVATE_FIELDS[self.__tablename__]:
+                raise AttributeError()
             return getattr(self, attr)
         except AttributeError:
-            raise NotFound("Requested resource does not exist.")
+            raise NotFound(f"Requested resource does not exist. {self.__tablename__} has no attribute {attr}.")
     
     def set_attr(self, attr, value):
         try:
-            if (not self.__class__.__table__.columns[attr].nullable) and (value is None):
-                raise MethodNotAllowed()
+            self.get_attr(attr) # Checks if attr exists
             setattr(self, attr, value)
         except AttributeError:
-            raise NotFound("Requested resource does not exist.")
+            raise NotFound(f"Requested resource does not exist. {self.__tablename__} has no attribute {attr}.")
         
     def to_dict(self) -> dict:
         dict_rep = dict()
         for field in self.__table__.c:
-            if field.name in PRIVATE_FIELDS:
+            if field.name in PRIVATE_FIELDS[self.__tablename__]:
                 continue
             attr = getattr(self, field.name)
             attr = str(attr) if type(attr) is bytearray else attr
