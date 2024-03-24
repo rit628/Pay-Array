@@ -64,6 +64,9 @@ def validate_user_data(user_data:dict) -> None:
         InvalidFieldError: Can be caught by InvalidFieldError handler in server. Contains a 400 error code.
     """
     for field, value in user_data.items():
+        if field not in field_pattern_map:
+            continue 
+
         if not field_pattern_map[field].match(value):
             raise InvalidFieldError(f"Invalid {field}.")
         
