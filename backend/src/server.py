@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 
 def create_app(name=__name__, testing=False):
     dupe_error_msg = re.compile(R"Duplicate entry \'([^\']*)\'")
+    non_nullable_error_msg = re.compile(R"Column \'([^\']*)\' cannot be null")
 
     AUTH_TYPE = os.environ.get("AUTH_TYPE")
     API_VERSION = os.environ.get("API_VERSION")
@@ -74,12 +75,17 @@ def create_app(name=__name__, testing=False):
     
     @app.errorhandler(IntegrityError)
     def handle_integrity_error(error):
-        dupe_error_match = dupe_error_msg.search(str(error.orig))
+        error_msg = str(error.orig)
+        dupe_error_match = dupe_error_msg.search(error_msg)
+        non_nullable_error_match = non_nullable_error_msg.search(error_msg)
         if dupe_error_match:
             username = dupe_error_match.group(1)
             response = jsonify(f"{username} is already taken.")
+        elif non_nullable_error_match:
+            field = non_nullable_error_match.group(1)
+            response = jsonify(f"{field} cannot be deleted.")
         else:
-            response = jsonify(str(error.orig))
+            response = jsonify(error_msg)
         response.status_code = 400
         return response
 
@@ -143,6 +149,8 @@ def create_app(name=__name__, testing=False):
             return jsonify(user_dict), 200
         elif request.method == "POST":
             data = request.get_json()
+            if "password" in data:  # Password should be updated seperately
+                data.pop("password")
             validate_user_data(data)
             for field, value in data.items():
                 user.set_attr(field, value)
@@ -162,8 +170,13 @@ def create_app(name=__name__, testing=False):
             return jsonify(fetched_resource), 200
         elif request.method == "POST":
             data = request.get_json()
-            validate_user_data(data)
-            user.set_attr(resource, data[resource])
+            validate_user_data({resource : data})
+            if resource == "password":
+                password_hash, salt = hash_password(data)
+                setattr(user, "password_hash", password_hash)
+                setattr(user, "salt", salt)
+            else:
+                user.set_attr(resource, data)
             db.session.commit()
             return jsonify(f"User's {resource} Updated Successfully."), 200
         elif request.method == "DELETE":
