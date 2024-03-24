@@ -3,16 +3,6 @@ from werkzeug.exceptions import NotFound, MethodNotAllowed
 
 PRIVATE_FIELDS = {"id", "salt", "password_hash"}
 
-def orm_object_to_dict(obj) -> dict:
-    dict_rep = dict()
-    for field in obj.__table__.c:
-        if field.name in PRIVATE_FIELDS:
-            continue
-        attr = getattr(obj, field.name)
-        attr = str(attr) if type(attr) is bytearray else attr
-        dict_rep.update({field.name : attr})
-    return dict_rep
-
 db = SQLAlchemy()
 
 class Base(db.Model):
@@ -30,6 +20,16 @@ class Base(db.Model):
             setattr(self, attr, value)
         except AttributeError:
             raise NotFound("Requested resource does not exist.")
+        
+    def to_dict(self) -> dict:
+        dict_rep = dict()
+        for field in self.__table__.c:
+            if field.name in PRIVATE_FIELDS:
+                continue
+            attr = getattr(self, field.name)
+            attr = str(attr) if type(attr) is bytearray else attr
+            dict_rep.update({field.name : attr})
+        return dict_rep
     
     def __repr__(self) -> str:
         rep_str = f"{self.__tablename__}("

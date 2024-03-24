@@ -3,7 +3,7 @@ from flask_cors import CORS
 import sqlalchemy as sql
 import os
 from .auth import *
-from .orm import db, orm_object_to_dict, User, Item 
+from .orm import db, User, Item 
 
 def create_app(name=__name__, testing=False):
     AUTH_TYPE = os.environ.get("AUTH_TYPE")
@@ -129,7 +129,7 @@ def create_app(name=__name__, testing=False):
     def user_access():
         user = get_request_user()
         if request.method == "GET":
-            user_dict = orm_object_to_dict(user)
+            user_dict = user.to_dict()
             return jsonify(user_dict), 200
         elif request.method == "POST":
             data = request.get_json()
@@ -165,7 +165,7 @@ def create_app(name=__name__, testing=False):
     def debug():
         statement = sql.select(User)
         users = db.session.scalars(statement).all()
-        users = [orm_object_to_dict(i) for i in users]
+        users = [i.to_dict() for i in users]
         return users
 
     return app
