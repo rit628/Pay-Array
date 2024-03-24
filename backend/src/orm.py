@@ -42,7 +42,7 @@ class Base(db.Model):
 class User(Base):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    username = db.Column(db.String(50), nullable=False)
+    username = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String(255), nullable=False)
     password_hash = db.Column(db.BINARY(32), nullable=False)
     salt = db.Column(db.BINARY(32), nullable=False)

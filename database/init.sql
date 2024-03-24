@@ -8,7 +8,8 @@ CREATE TABLE user (
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     phone CHAR(10),
-    budget DECIMAL(5,2) UNSIGNED
+    budget DECIMAL(5,2) UNSIGNED,
+    UNIQUE(username)
 );
 
 CREATE TABLE item (
