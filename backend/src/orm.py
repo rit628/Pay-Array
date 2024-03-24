@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.exceptions import NotFound, MethodNotAllowed
 
 PRIVATE_FIELDS = {"id", "salt", "password_hash"}
 
@@ -14,7 +15,31 @@ def orm_object_to_dict(obj) -> dict:
 
 db = SQLAlchemy()
 
-class User(db.Model):
+class Base(db.Model):
+    __abstract__ = True
+    def get_attr(self, attr):
+        try:
+            return getattr(self, attr)
+        except AttributeError:
+            raise NotFound("Requested resource does not exist.")
+    
+    def set_attr(self, attr, value):
+        try:
+            if (not self.__class__.__table__.columns[attr].nullable) and (value is None):
+                raise MethodNotAllowed()
+            setattr(self, attr, value)
+        except AttributeError:
+            raise NotFound("Requested resource does not exist.")
+    
+    def __repr__(self) -> str:
+        rep_str = f"{self.__tablename__}("
+        for field in self.__table__.c:
+            attr = getattr(self, field.name)
+            rep_str += f"{field.name}={attr}, "
+        rep_str += "\b\b)"
+        return rep_str
+
+class User(Base):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     username = db.Column(db.String(50), nullable=False)
@@ -27,20 +52,12 @@ class User(db.Model):
     phone = db.Column(db.String(10))
     budget = db.Column(db.DECIMAL)
 
-    def __repr__(self):
-        return f'''<User(id={self.id}, username={self.username}, email={self.email}, 
-                    household_id={self.household_id}, first_name={self.first_name}, 
-                    last_name={self.first_name}, phone={self.phone}, budget={self.budget})'''
-
-class Item(db.Model):
+class Item(Base):
     __tablename__ = "item"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(100))
     price = db.Column(db.DECIMAL)
     purchase_link = db.Column(db.String(2048))
-
-    def __repr__(self):
-        return f"<Item(id={self.id}, name={self.name}, price={self.price}, purchase_link={self.purchase_link}"
     
 user_preference = db.Table('user_preference',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
