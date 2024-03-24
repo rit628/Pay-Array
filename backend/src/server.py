@@ -2,10 +2,14 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import sqlalchemy as sql
 import os
+import re
 from .auth import *
-from .orm import db, User, Item 
+from .orm import db, User, Item
+from sqlalchemy.exc import IntegrityError
 
 def create_app(name=__name__, testing=False):
+    dupe_error_msg = re.compile(R"Duplicate entry \'([^\']*)\'")
+
     AUTH_TYPE = os.environ.get("AUTH_TYPE")
     API_VERSION = os.environ.get("API_VERSION")
     API_ROOT_PATH = f"/api/{API_VERSION}"
@@ -67,6 +71,17 @@ def create_app(name=__name__, testing=False):
         response = jsonify(str(error))
         response.status_code = error.status_code
         return response
+    
+    @app.errorhandler(IntegrityError)
+    def handle_integrity_error(error):
+        dupe_error_match = dupe_error_msg.search(str(error.orig))
+        if dupe_error_match:
+            username = dupe_error_match.group(1)
+            response = jsonify(f"{username} is already taken.")
+        else:
+            response = jsonify(str(error.orig))
+        response.status_code = 400
+        return response
 
     @app.route("/validate-server-runtime/", methods=["GET"])
     def validate_server_runtime():
@@ -107,11 +122,6 @@ def create_app(name=__name__, testing=False):
         if "password" not in data:
             return jsonify("No Password Provided."), 400
         validate_user_data(data)
-        
-        statement = sql.select(User).where(User.username == data["username"])
-        user = db.session.scalars(statement).first()
-        if user is not None:    # guard if user already exists with given username
-            return jsonify(f"{data["username"]} is already taken."), 400
         
         password = data["password"]
         password_hash, salt = hash_password(password)
