@@ -64,6 +64,9 @@ def validate_user_data(user_data:dict) -> None:
         InvalidFieldError: Can be caught by InvalidFieldError handler in server. Contains a 400 error code.
     """
     for field, value in user_data.items():
+        if field not in field_pattern_map:
+            continue 
+
         if not field_pattern_map[field].match(value):
             raise InvalidFieldError(f"Invalid {field}.")
         
@@ -129,3 +132,5 @@ def decode_token(token:str, jwt_encoding_algorithm:str = JWT_ENCODING_ALGORITHM)
         return payload
     except jwt.ExpiredSignatureError: # token has expired
         raise AuthenticationError("Expired Token.")
+    except jwt.InvalidTokenError:
+        raise AuthenticationError("Invalid Token.")
