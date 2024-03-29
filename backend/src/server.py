@@ -4,6 +4,7 @@ import sqlalchemy as sql
 import os
 import re
 from .auth import *
+from xxhash import xxh32
 import redis
 from .orm import db, User, Item
 from sqlalchemy.exc import IntegrityError
@@ -64,7 +65,7 @@ def create_app(name=__name__, testing=False):
             User: User object associated with id provided in authorization header.
         """
         token = get_auth_token()
-        if cache.get(token) is not None:
+        if cache.get(xxh32(token).hexdigest()) is not None:
             raise AuthenticationError("Invalid Token.")
         id = decode_token(token)["user_id"]
         user = db.get_or_404(User, id, description="User does not exist.")
@@ -130,7 +131,8 @@ def create_app(name=__name__, testing=False):
     @app.route(f"{API_ROOT_PATH}/logout/", methods=["DELETE"])
     def logout():
         token = get_auth_token()
-        cache.set(token, 0)
+        exp_time = decode_token(token)["exp"]
+        cache.set(xxh32(token).hexdigest(), 0, exat=exp_time)
         return jsonify("Logout Successful."), 200
 
     @app.route(f"{API_ROOT_PATH}/users/", methods=["POST"])
