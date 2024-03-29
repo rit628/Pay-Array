@@ -67,7 +67,22 @@ services:
     env_file:
       - .env
       - .env.local
+  
+  cache:
+    container_name: ${CACHE_CONTAINER_NAME}
+    build:
+      context: .
+      dockerfile: ./.docker/cache/Dockerfile
+    image: ${CACHE_CONTAINER_NAME}:development
+    volumes:
+      - cache_data:/data
+    expose:
+      - ${CACHE_CONTAINER_PORT}
+    env_file:
+      - .env
+      - .env.local
 
 volumes:
   node_modules:
   database_data:
+  cache_data:
