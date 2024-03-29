@@ -155,3 +155,34 @@ def test_user_login_invalid_username(client):
 
     assert response.status_code == 404
     assert response.get_json() == "No Account with Username: nonexistentUser."
+
+def test_user_logout(client):
+    response = client.post(f"{API_ROOT_PATH}/users/", json={
+        "username" : "testUser999",
+        "first_name" : "Test",
+        "last_name" : "User",
+        "email" : "testuser@domain.com",
+        "phone" : "1234567890",
+        "password" : "terrible_password"
+    })
+
+    response = client.post(f"{API_ROOT_PATH}/login/", json={
+        "username" : "testUser999",
+        "password" : "terrible_password"
+    })
+
+    auth_header = response.get_json()
+
+    response = client.delete(f"{API_ROOT_PATH}/logout/", headers={
+        "Authorization" : auth_header
+    })
+
+    assert response.status_code == 200
+    assert response.get_json() == "Logout Successful."
+
+    response = client.get(f"{API_ROOT_PATH}/users/me/", headers={
+        "Authorization" : auth_header
+    })
+
+    assert response.status_code == 401
+    assert response.get_json() == "Invalid Token."
