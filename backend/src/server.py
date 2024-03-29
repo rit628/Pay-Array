@@ -4,6 +4,7 @@ import sqlalchemy as sql
 import os
 import re
 from .auth import *
+import redis
 from .orm import db, User, Item
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
@@ -16,20 +17,24 @@ def create_app(name=__name__, testing=False):
     API_VERSION = os.environ.get("API_VERSION")
     API_ROOT_PATH = f"/api/{API_VERSION}"
 
+    CACHE_HOSTNAME = os.environ.get("CACHE_CONTAINER_NAME")
+    CACHE_PORT = os.environ.get("CACHE_CONTAINER_PORT")
+
     RDBMS = "mysql"
     DRIVER = "mysqlconnector"
-    HOSTNAME = os.environ.get("DATABASE_CONTAINER_NAME")
+    DATABASE_HOSTNAME = os.environ.get("DATABASE_CONTAINER_NAME")
     USERNAME = os.environ.get("DATABASE_USER")
     PASSWORD = os.environ.get("MYSQL_ROOT_PASSWORD")
-    PORT = os.environ.get("DATABASE_CONTAINER_PORT")
+    DATABASE_PORT = os.environ.get("DATABASE_CONTAINER_PORT")
     DATABASE_PRODUCTION = os.environ.get('DATABASE_NAME_PRODUCTION')
     DATABASE_TEST = os.environ.get('DATABASE_NAME_TEST')
 
-    PRODUCTION_URI = f"{RDBMS}+{DRIVER}://{USERNAME}:{PASSWORD}@{HOSTNAME}:{PORT}/{DATABASE_PRODUCTION}"
-    TEST_URI = f"{RDBMS}+{DRIVER}://{USERNAME}:{PASSWORD}@{HOSTNAME}:{PORT}/{DATABASE_TEST}"
+    PRODUCTION_URI = f"{RDBMS}+{DRIVER}://{USERNAME}:{PASSWORD}@{DATABASE_HOSTNAME}:{DATABASE_PORT}/{DATABASE_PRODUCTION}"
+    TEST_URI = f"{RDBMS}+{DRIVER}://{USERNAME}:{PASSWORD}@{DATABASE_HOSTNAME}:{DATABASE_PORT}/{DATABASE_TEST}"
 
     app = Flask(name)
     CORS(app)
+    cache = redis.Redis(host=CACHE_HOSTNAME, port=CACHE_PORT)
     app.config["SQLALCHEMY_DATABASE_URI"] = PRODUCTION_URI if not testing else TEST_URI
     db.init_app(app)        
 
@@ -58,6 +63,8 @@ def create_app(name=__name__, testing=False):
             User: User object associated with id provided in authorization header.
         """
         token = get_auth_token()
+        if cache.get(token) is not None:
+            raise AuthenticationError("Invalid Token.")
         id = decode_token(token)["user_id"]
         user = db.get_or_404(User, id, description="User does not exist.")
         return user
@@ -121,8 +128,8 @@ def create_app(name=__name__, testing=False):
 
     @app.route(f"{API_ROOT_PATH}/logout/", methods=["DELETE"])
     def logout():
-        # TODO: Add a cache database to invalidate tokens post logout
         token = get_auth_token()
+        cache.set(token, 0)
         return jsonify("Logout Successful."), 200
 
     @app.route(f"{API_ROOT_PATH}/users/", methods=["POST"])
