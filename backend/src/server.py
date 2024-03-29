@@ -19,6 +19,7 @@ def create_app(name=__name__, testing=False):
 
     CACHE_HOSTNAME = os.environ.get("CACHE_CONTAINER_NAME")
     CACHE_PORT = os.environ.get("CACHE_CONTAINER_PORT")
+    CACHE_DB = 0 if not testing else 1
 
     RDBMS = "mysql"
     DRIVER = "mysqlconnector"
@@ -34,7 +35,7 @@ def create_app(name=__name__, testing=False):
 
     app = Flask(name)
     CORS(app)
-    cache = redis.Redis(host=CACHE_HOSTNAME, port=CACHE_PORT)
+    cache = redis.Redis(host=CACHE_HOSTNAME, port=CACHE_PORT, db=CACHE_DB)
     app.config["SQLALCHEMY_DATABASE_URI"] = PRODUCTION_URI if not testing else TEST_URI
     db.init_app(app)        
 
