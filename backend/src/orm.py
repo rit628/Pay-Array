@@ -4,7 +4,8 @@ from werkzeug.exceptions import NotFound
 db = SQLAlchemy()
 
 PRIVATE_FIELDS = {"user": {"id", "salt", "password_hash"},
-                  "item": {"id"}
+                  "item": {},
+                  "transaction": {}
                 }
 
 class Base(db.Model):
@@ -47,6 +48,11 @@ user_preference = db.Table('user_preference',
     db.Column('item_id', db.Integer, db.ForeignKey('item.id'), primary_key=True)
 )
 
+transaction_join = db.Table('transaction_user',
+    db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+)
+
 class User(Base):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -60,6 +66,7 @@ class User(Base):
     phone = db.Column(db.String(10))
     budget = db.Column(db.DECIMAL)
     items = db.relationship('Item', secondary=user_preference, back_populates="users")
+    transactions = db.relationship('Transaction', secondary=transaction_join, back_populates="users")
 
 class Item(Base):
     __tablename__ = "item"
@@ -68,3 +75,12 @@ class Item(Base):
     price = db.Column(db.DECIMAL)
     purchase_link = db.Column(db.String(2048))
     users = db.relationship('User', secondary=user_preference, back_populates="items")
+
+class Transaction(Base):
+    __tablename__ = "transaction"
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    amount = db.Column(db.DECIMAL, nullable=False)
+    completed = db.Column(db.BOOLEAN, nullable=False)
+    item_id = db.Column(db.Integer, nullable=False)
+    users = db.relationship('User', secondary=transaction_join, back_populates="transactions")
+    
