@@ -16,7 +16,22 @@ CREATE TABLE item (
     id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
     name VARCHAR(100),
     price DECIMAL(5,2) UNSIGNED,
-    purchase_link VARCHAR(2048)
+    purchase_link VARCHAR(2048),
+    UNIQUE(name)
+);
+
+CREATE TABLE transaction (
+    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    amount DECIMAL(5,2) NOT NULL,
+    completed BOOLEAN NOT NULL,
+    item_id INT NOT NULL
+);
+
+CREATE TABLE transaction_user (
+    transaction_id INT NOT NULL,
+    user_id INT NOT NULL,
+    FOREIGN KEY (transaction_id) REFERENCES transaction(id),
+    FOREIGN KEY (user_id) REFERENCES user(id)
 );
 
 CREATE TABLE user_preference (
