@@ -6,7 +6,7 @@ import re
 from .auth import *
 from xxhash import xxh32
 import redis
-from .orm import db, User, Item, Transaction, transaction_join, user_preference
+from .orm import db, User, Item, Transaction, transaction_user, transaction_user_due, user_preference
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
 
@@ -239,6 +239,7 @@ def create_app(name=__name__, testing=False):
             return jsonify(transactions), 200
         elif request.method == "POST":
             data = request.get_json()
+            data.update({"purchaser_id": user.id})
             transaction = Transaction(**data)
             user.transactions.append(transaction)
             db.session.commit()
@@ -265,7 +266,7 @@ def create_app(name=__name__, testing=False):
             user.set_attr(resource, None)
             db.session.commit()
             return jsonify(f"User's {resource} Deleted Successfully."), 200
-        
+
     @app.route("/debug/", methods=["GET"])
     def debug():
         statement = sql.select(User)

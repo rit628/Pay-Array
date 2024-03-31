@@ -48,7 +48,12 @@ user_preference = db.Table('user_preference',
     db.Column('item_id', db.Integer, db.ForeignKey('item.id'), primary_key=True)
 )
 
-transaction_join = db.Table('transaction_user',
+transaction_user = db.Table('transaction_user',
+    db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+)
+
+transaction_user_due = db.Table('transaction_user_due',
     db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id'), primary_key=True),
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
 )
@@ -66,7 +71,8 @@ class User(Base):
     phone = db.Column(db.String(10))
     budget = db.Column(db.DECIMAL)
     items = db.relationship('Item', secondary=user_preference, back_populates="users")
-    transactions = db.relationship('Transaction', secondary=transaction_join, back_populates="users")
+    transactions = db.relationship('Transaction', secondary=transaction_user, back_populates="users")
+    transactions_due = db.relationship('Transaction', secondary=transaction_user_due, back_populates="users_due")
 
 class Item(Base):
     __tablename__ = "item"
@@ -82,5 +88,7 @@ class Transaction(Base):
     amount = db.Column(db.DECIMAL, nullable=False)
     completed = db.Column(db.BOOLEAN, nullable=False)
     item_id = db.Column(db.Integer, nullable=False)
-    users = db.relationship('User', secondary=transaction_join, back_populates="transactions")
+    purchaser_id = db.Column(db.Integer, nullable=False)
+    users = db.relationship('User', secondary=transaction_user, back_populates="transactions")
+    users_due = db.relationship('User', secondary=transaction_user_due, back_populates="transactions_due")
     
