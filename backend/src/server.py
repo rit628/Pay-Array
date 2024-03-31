@@ -6,7 +6,7 @@ import re
 from .auth import *
 from xxhash import xxh32
 import redis
-from .orm import db, User, Item
+from .orm import db, User, Item, user_preference
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
 
@@ -70,6 +70,21 @@ def create_app(name=__name__, testing=False):
         id = decode_token(token)["user_id"]
         user = db.get_or_404(User, id, description="User does not exist.")
         return user
+    
+    def get_item_by_name(name:str) -> Item:
+        """Gets the item object with the given name.
+
+        Args:
+            name (str): Name of the item.
+
+        Returns:
+            Item: Item object with given name.
+        """
+        statement = sql.select(Item).where(Item.name == name)
+        item = db.session.scalars(statement).first()
+        if item is None:
+            return jsonify(f"Item {name} not found."), 404
+        return item
 
     @app.errorhandler(InvalidFieldError)
     def handle_invalid_field_error(error):
@@ -177,7 +192,45 @@ def create_app(name=__name__, testing=False):
             db.session.delete(user)
             db.session.commit()
             return jsonify("User Deleted Successfully."), 200
-            
+    
+    @app.route(f"{API_ROOT_PATH}/users/me/preferences/", methods=["GET", "POST", "DELETE"])
+    def user_preferences():
+        user = get_request_user()
+        if request.method == "GET":
+            items = [item.to_dict() for item in user.items]
+            return jsonify(items), 200
+        elif request.method == "POST":
+            data = request.get_json()
+            item = Item(**data)
+            user.items.append(item)
+            db.session.commit()
+            return jsonify(f"{item.name} added to {user.username}'s  preferences"), 200
+        elif request.method == "DELETE":
+            user.items.clear()
+            db.session.commit()
+            return jsonify(f"{user.username}'s item preferences cleared successfully."), 200
+    
+    @app.route(f"{API_ROOT_PATH}/users/me/preferences/<item>/", methods=["GET", "POST", "DELETE"])
+    def user_preferences_item(item:str):
+        user = get_request_user()
+        if request.method == "GET":
+            statement = sql.select(Item).where(Item.name == item).join(user_preference).join(User).where(User.id == user.id)           
+            requested_item = db.session.scalars(statement).first()
+            if requested_item is None:
+                return jsonify(f"Item {item} not in {user.username}'s prefrences."), 404
+            return jsonify(requested_item.to_dict()), 200
+        elif request.method == "POST":
+            retreived_item = get_item_by_name(item)
+            user.items.append(retreived_item)
+            db.session.commit()
+            return f"{item.name} added to {user.username}'s  preferences", 200
+        elif request.method == "DELETE":
+            retreived_item = get_item_by_name(item)
+            statement = user_preference.delete().where(user_preference.c.user_id == user.id).where(user_preference.c.item_id == retreived_item.id)
+            db.session.execute(statement)
+            db.session.commit()
+            return jsonify(f"{user.username}'s item preference for {item} removed successfully."), 200
+        
     
     @app.route(f"{API_ROOT_PATH}/users/me/<resource>/", methods=["GET", "POST", "DELETE"])
     def user_resource_access(resource:str):
@@ -200,7 +253,7 @@ def create_app(name=__name__, testing=False):
             user.set_attr(resource, None)
             db.session.commit()
             return jsonify(f"User's {resource} Deleted Successfully."), 200
-    
+        
     @app.route("/debug/", methods=["GET"])
     def debug():
         statement = sql.select(User)
