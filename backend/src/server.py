@@ -6,7 +6,7 @@ import re
 from .auth import *
 from xxhash import xxh32
 import redis
-from .orm import db, User, Item, user_preference
+from .orm import db, User, Item, Transaction, transaction_join, user_preference
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
 
@@ -223,7 +223,7 @@ def create_app(name=__name__, testing=False):
             retreived_item = get_item_by_name(item)
             user.items.append(retreived_item)
             db.session.commit()
-            return f"{item.name} added to {user.username}'s  preferences", 200
+            return f"{item.name} added to {user.username}'s  preferences.", 200
         elif request.method == "DELETE":
             retreived_item = get_item_by_name(item)
             statement = user_preference.delete().where(user_preference.c.user_id == user.id).where(user_preference.c.item_id == retreived_item.id)
@@ -231,7 +231,19 @@ def create_app(name=__name__, testing=False):
             db.session.commit()
             return jsonify(f"{user.username}'s item preference for {item} removed successfully."), 200
         
-    
+    @app.route(f"{API_ROOT_PATH}/users/me/transactions/", methods=['GET', 'POST'])
+    def transactions():
+        user = get_request_user()
+        if request.method == "GET":
+            transactions = [transaction.to_dict() for transaction in user.transactions]
+            return jsonify(transactions), 200
+        elif request.method == "POST":
+            data = request.get_json()
+            transaction = Transaction(**data)
+            user.transactions.append(transaction)
+            db.session.commit()
+            return jsonify(f"Transaction complete."), 200
+
     @app.route(f"{API_ROOT_PATH}/users/me/<resource>/", methods=["GET", "POST", "DELETE"])
     def user_resource_access(resource:str):
         user = get_request_user()
