@@ -7,7 +7,7 @@ const Profile = () => {
       <Head>
         <title>PayArray</title>
       </Head>
-      <h1>Landing</h1>
+      <h1>Profile</h1>
       <p>Split costs with your rommates effortlessly</p>
     </div>
   );
