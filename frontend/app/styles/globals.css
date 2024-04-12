@@ -61,14 +61,6 @@ h1 {
   background-color: #f0f0f0;
 }
 
-.loginContainer {
-  background-color: #fff;
-  padding: 32px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 24rem;
-}
-
 .title {
   font-size: 1.25rem;
   font-weight: 600;
@@ -114,10 +106,10 @@ h1 {
 
 .login-container {
   background-color: #fff;
-  padding: 32px;
+  padding: 5vw;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add box-shadow to create a box around the login page */
-  width: 24rem;
+  width: 30%;
 }
 * {
   box-sizing: border-box;
@@ -129,13 +121,15 @@ body {
 }
 
 .container {
-  margin: 1rem;
-  text-align: center;
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav {
-  background-color: #333;
-  color: white;
+  background-color: #091A03;
+  color: #E4EFE1;
   display: flex;
   justify-content: space-between;
   align-items: stretch;
@@ -165,9 +159,11 @@ body {
 }
 
 .nav li.active {
-  background-color: #555;
+  background-color: #1B3F10;
+  color: #E4EFE1;
 }
 
 .nav li:hover {
-  background-color: #777;
+  background-color: #E4EFE1;
+  color: #102909;
 }
