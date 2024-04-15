@@ -21,6 +21,8 @@ const SignUpPage: React.FC = () => {
     };
   
     return (
+      <>
+      <title>Sign Up | PayArray</title>
         <div className="container">
           <div className="login-container">
             <h2 className="title">Sign Up</h2>
@@ -89,6 +91,7 @@ const SignUpPage: React.FC = () => {
             </form>
           </div>
         </div>
+        </>
       );
     };
   
