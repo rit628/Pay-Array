@@ -31,7 +31,6 @@ h1 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
 }
 
 .button-container {
@@ -59,14 +58,6 @@ h1 {
   align-items: center;
   justify-content: center;
   background-color: #f0f0f0;
-}
-
-.loginContainer {
-  background-color: #fff;
-  padding: 32px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 24rem;
 }
 
 .title {
@@ -97,26 +88,86 @@ h1 {
   outline: none;
 }
 
-.submitButton {
+.submit-button {
   width: 100%;
   padding: 8px;
-  background-color: #4299e1;
+  background-color: #091A03;
   color: #fff;
   border: none;
   border-radius: 4px;
+  margin-top: 10px;
   cursor: pointer;
   outline: none;
 }
 
-.submitButton:hover {
-  background-color: #3182ce;
+.submit-button:hover {
+  background-color: #E4EFE1;
+  color: #091A03;
 }
 
 .login-container {
   background-color: #fff;
-  padding: 32px;
+  padding: 5vw;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add box-shadow to create a box around the login page */
+  width: 30%;
+}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: #f0f0f0;
+}
+
+.container {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav {
+  background-color: #091A03;
+  color: #E4EFE1;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 2rem;
+  padding: 0 1rem;
+}
+
+.site-title {
+  font-size: 2rem;
+}
+
+.nav ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+}
+
+.nav a {
+  color: inherit;
+  text-decoration: none;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: .25rem;
+}
+
+.nav li.active {
+  color: #E4EFE1;
+}
+
+.nav li:hover {
+  color: #1a560a;
+}
+
+.customButton {
   width: 24rem;
 }
 
@@ -187,6 +238,9 @@ h1 {
   text-decoration: none;
   border-radius: 5px;
   margin-right: 10px;
+}
+
+.customButton:hover {
   width: 200px;
   height: 30px;
 
@@ -195,6 +249,18 @@ h1 {
 .payReqButton:hover{
   background-color: #054330;
   color: #d1f0d7; 
+}
+
+.info {
+  display: flex;
+}
+
+.card {
+  padding: 10px;
+  margin: 10px;
+  display: flex;
+  background-color: #091A03;
+  color: #d1f0d7;
 }
 
 .payReqButtons{

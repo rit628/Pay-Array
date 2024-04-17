@@ -1,7 +1,8 @@
 import Head from "next/head";
-import Link from 'next/link';
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 
-const Home = () => {
+const OpenScreen = () => {
   return (
     <div className="container">
       <Head>
@@ -9,16 +10,14 @@ const Home = () => {
       </Head>
       <h1>PayArray</h1>
       <p>Split costs with your rommates effortlessly</p>
-      <div className="button-container">
-        <Link href="/signup">
-          <button className="button">Sign Up</button>
-        </Link>
-        <Link href="/login">
-          <button className="button">Login</button>
-        </Link>
+      <h2>Features</h2>
+      <div className="info">
+      <Card className="card">Test</Card>
+      <Card className="card">Another Test</Card>
+      <Card className="card">More Tests</Card>
       </div>
     </div>
   );
 };
 
-export default Home;
+export default OpenScreen;
