@@ -119,3 +119,86 @@ h1 {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add box-shadow to create a box around the login page */
   width: 24rem;
 }
+
+/*userPage styling*/
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  left: 0px;
+  padding: 20px; /* Add padding for better spacing */
+}
+
+.userButtonGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.userButton {
+  display: inline-block;
+  padding: 25px 70px; 
+  font-size: 18px; 
+  background-color: #d1f0d7;
+  color: #0f3a12;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-right: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.userButton:hover {
+  background-color: #054330;
+  color: #d1f0d7; 
+}
+
+.helloUsername{
+  font-size: x-large;
+  padding-bottom: 40px;
+  text-align: left;
+}
+
+.transactionContent{
+  flex-direction: column;
+  position: absolute;
+  left: 450px;
+  top:40px;
+
+}
+
+.transactionTitle{
+  font-size: x-large;
+}
+
+/*payRequest page*/
+.payReqTitle{
+  text-align: center;
+  padding-top: 60px;
+}
+
+.payReqButton{
+  flex: 1; /* Each button takes equal space */
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #d1f0d7;
+  color: #0f3a12;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-right: 10px;
+  width: 200px;
+  height: 30px;
+
+}
+
+.payReqButton:hover{
+  background-color: #054330;
+  color: #d1f0d7; 
+}
+
+.payReqButtons{
+  display: flex; /* Use flexbox */
+  justify-content: space-between; /* Distribute items evenly along the main axis */
+  margin-top: 20px; /* Adjust margin as needed */
+}
