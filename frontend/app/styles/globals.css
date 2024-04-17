@@ -31,7 +31,6 @@ h1 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
 }
 
 .button-container {
@@ -161,11 +160,36 @@ body {
 }
 
 .nav li.active {
-  background-color: #1B3F10;
   color: #E4EFE1;
 }
 
 .nav li:hover {
-  background-color: #E4EFE1;
-  color: #102909;
+  color: #1a560a;
+}
+
+.customButton {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #d1f0d7;
+  color: #0f3a12;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.customButton:hover {
+  background-color: #054330;
+  color: #d1f0d7; 
+}
+
+.info {
+  display: flex;
+}
+
+.card {
+  padding: 10px;
+  margin: 10px;
+  display: flex;
+  background-color: #091A03;
+  color: #d1f0d7;
 }
