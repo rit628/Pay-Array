@@ -8,7 +8,7 @@ const Join = () => {
         <title>PayArray</title>
       </Head>
       <h1>PayArray</h1>
-      <p>Split costs with your rommates effortlessly</p>
+      <p>Split costs with your roommates effortlessly</p>
       <div className="button-container">
         <Link href="/signup" legacyBehavior>
           <button className="button">Sign Up</button>

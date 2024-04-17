@@ -1,4 +1,3 @@
-// Navbar.tsx
 import Link from "next/link";
 
 export default function Navbar() {
@@ -8,9 +7,8 @@ export default function Navbar() {
         PayArray
       </Link>
       <ul>
-        <CustomLink href="/home">Home</CustomLink>
-        <CustomLink href="/landing">Landing</CustomLink>
-        <CustomLink href="/profile">Profile</CustomLink>
+        <CustomLink href="/household">Household</CustomLink>
+        <CustomLink href="/user">User</CustomLink>
       </ul>
     </nav>
   );

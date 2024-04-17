@@ -14,7 +14,7 @@ const JoinHouse = () => {
         <Link href="/createhouse" legacyBehavior>
           <Button className="customButton">Create a Household</Button>
         </Link>
-        <Link href="/login" legacyBehavior>
+        <Link href="/enterhouse" legacyBehavior>
             <Button type="submit" className="customButton">Enter House Code</Button>
         </Link>
       </div>

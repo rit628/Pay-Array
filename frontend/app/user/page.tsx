@@ -27,7 +27,7 @@ const UserLandingPage: React.FC = () => {
       <div className="sidebar">
           <h1 className="helloUsername">Hello {formData.username}!</h1>
           <div className="userButtonGroup">
-            <Link href= "/payRequest">
+            <Link href= "/pay">
             <button className="userButton w-full">Pay or Request</button>
             </Link>
               <button className="userButton w-full">My Household</button>

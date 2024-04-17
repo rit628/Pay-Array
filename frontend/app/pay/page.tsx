@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-const payRequest: React.FC = () => {
+const Pay: React.FC = () => {
     return (
         /*need some input tag for money, need to input area, reason input area*/
         <div className = 'container'>
@@ -21,4 +21,4 @@ const payRequest: React.FC = () => {
     }
     
   
-  export default payRequest;
+  export default Pay;

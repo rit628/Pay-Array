@@ -1,16 +1,15 @@
 import Head from "next/head";
-import Link from 'next/link';
 
-const Profile = () => {
+const Request = () => {
   return (
     <>
-      <title>Profile | PayArray</title>
+      <title>Landing Page | PayArray</title>
       <div className="container">
-        <h1>Profile</h1>
+        <h1>Landing</h1>
         <p>Split costs with your rommates effortlessly</p>
       </div>
     </>
   );
 };
 
-export default Profile;
+export default Request;
