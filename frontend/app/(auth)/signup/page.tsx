@@ -123,7 +123,9 @@ const SignUpPage: React.FC = () => {
                   required
                 />
               </div>
+              <Link href='/joinhouse'>
               <button type="submit" className="submit-button">Sign Up</button>
+              </Link>
             </form>
           </div>
         </div>
