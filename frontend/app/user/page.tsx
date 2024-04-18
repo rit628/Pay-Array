@@ -4,34 +4,17 @@ import Link from 'next/link';
 
 
 const UserLandingPage: React.FC = () => {
-    const [formData, setFormData] = useState({
-      email: '',
-      username: '',
-      password: '',
-      confirmPassword: '',
-    });
-  
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = e.target;
-      setFormData({ ...formData, [name]: value });
-    };
-  
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      console.log(formData);
-      // logic
-    };
-  
     return (
       <div className="container">
       <div className="sidebar">
-          <h1 className="helloUsername">Hello {formData.username}!</h1>
+          <h1 className="helloUsername">Hello (username)!</h1>
           <div className="userButtonGroup">
             <Link href= "/pay">
-            <button className="userButton w-full">Pay or Request</button>
+            <button className="userButton w-full">Pay</button>
             </Link>
-              <button className="userButton w-full">My Household</button>
-              <button className="userButton w-full">My Budget</button>
+            <Link href= "/request">
+            <button className="userButton w-full">Request</button>
+            </Link>
           </div>
       </div>
       <div className="transactionContent">
