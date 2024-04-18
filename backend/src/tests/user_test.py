@@ -33,7 +33,6 @@ def test_get_account_details(client):
         "email" : "testuser@domain.com",
         "phone" : "1234567890",
         "household_id" : None,
-        "budget" : None,
         "balance" : None
     }
 
@@ -157,7 +156,6 @@ def test_delete_account_resource(client):
         "email" : "testuser@domain.com",
         "phone" : None,
         "household_id" : None,
-        "budget" : None,
         "balance" : None
     }
 
