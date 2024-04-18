@@ -178,7 +178,7 @@ body {
   flex-direction: column;
   position: absolute;
   left: 0px;
-  padding: 20px; /* Add padding for better spacing */
+  padding: 20px;
 }
 
 .userButtonGroup {
@@ -198,6 +198,7 @@ body {
   margin-right: 10px;
   margin-bottom: 20px;
   text-align: center;
+  width: 220px;
 }
 
 .userButton:hover {
@@ -215,7 +216,7 @@ body {
   flex-direction: column;
   position: absolute;
   left: 450px;
-  top:40px;
+  top:70px;
 
 }
 
@@ -226,7 +227,6 @@ body {
 /*payRequest page*/
 .payReqTitle{
   text-align: center;
-  padding-top: 60px;
 }
 
 .payReqButton{
@@ -264,7 +264,14 @@ body {
 }
 
 .payReqButtons{
-  display: flex; /* Use flexbox */
-  justify-content: space-between; /* Distribute items evenly along the main axis */
-  margin-top: 20px; /* Adjust margin as needed */
+  display: flex;
+  justify-content: space-between; 
+  margin-top: 20px; 
 }
+
+.moneyAmount{
+  font-size: 70px;
+}
+
+
+

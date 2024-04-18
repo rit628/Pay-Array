@@ -2,13 +2,16 @@ import Head from "next/head";
 
 const Request = () => {
   return (
-    <>
-      <title>Landing Page | PayArray</title>
-      <div className="container">
-        <h1>Landing</h1>
-        <p>Split costs with your rommates effortlessly</p>
-      </div>
-    </>
+        /*need some input tag for money, need to input area, reason input area*/
+        <div className = 'container'>
+            <h1 className= 'payReqTitle'>Let's Request!</h1>
+        <div className='moneyAmount'>
+            <p>$</p>
+        </div>
+        <div className= 'payReqButtons'>
+        <button className= 'payReqButton w-full'>Request</button>
+        </div>
+        </div>
   );
 };
 
