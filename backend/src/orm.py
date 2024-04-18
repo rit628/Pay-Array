@@ -48,15 +48,11 @@ user_preference = db.Table('user_preference',
     db.Column('item_id', db.Integer, db.ForeignKey('item.id'), primary_key=True)
 )
 
-transaction_user = db.Table('transaction_user',
-    db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id'), primary_key=True),
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-)
-
-transaction_user_due = db.Table('transaction_user_due',
-    db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id'), primary_key=True),
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-)
+class TransactionUser(Base):
+    __tablename__ = 'transaction_user'
+    transaction_id = db.mapped_column(db.ForeignKey("transaction.id"), primary_key=True)
+    user_id = db.mapped_column(db.ForeignKey("user.id"), primary_key=True)
+    balance = db.Column(db.DECIMAL(5,2))
 
 class User(Base):
     __tablename__ = "user"
@@ -69,11 +65,9 @@ class User(Base):
     first_name = db.Column(db.String(50))
     last_name = db.Column(db.String(50))
     phone = db.Column(db.String(10))
-    budget = db.Column(db.DECIMAL(5,2))
     balance = db.Column(db.DECIMAL(5,2))
     items = db.relationship('Item', secondary=user_preference, back_populates="users")
-    transactions = db.relationship('Transaction', secondary=transaction_user, back_populates="users")
-    transactions_due = db.relationship('Transaction', secondary=transaction_user_due, back_populates="users_due")
+    transactions = db.relationship('Transaction', secondary="transaction_user", back_populates="users")
 
 class Item(Base):
     __tablename__ = "item"
@@ -90,6 +84,5 @@ class Transaction(Base):
     completed = db.Column(db.BOOLEAN, nullable=False)
     item_id = db.Column(db.Integer, nullable=False)
     purchaser_id = db.Column(db.Integer, nullable=False)
-    users = db.relationship('User', secondary=transaction_user, back_populates="transactions")
-    users_due = db.relationship('User', secondary=transaction_user_due, back_populates="transactions_due")
+    users = db.relationship('User', secondary="transaction_user", back_populates="transactions")
     

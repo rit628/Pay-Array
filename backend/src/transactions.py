@@ -1,4 +1,4 @@
-from .orm import db, User, Item, Transaction, transaction_user_due
+from .orm import db, User, Item, Transaction, TransactionUser
 import sqlalchemy as sql
 from werkzeug.exceptions import NotFound
 from .auth import InvalidFieldError
@@ -28,15 +28,26 @@ def get_transaction_by_id(id:int) -> Transaction:
 
 def update_user_balance(user:User, amount:float) -> None:
     # TODO: Add a call to a method for the notification system
-    if user.balance + amount < user.budget:
+    if user.balance + amount < 0:
         raise BudgetError("Transaction exceeds user's budget.")
     user.balance += amount
 
+def set_transaction_debts(transaction:Transaction, users:list[User]) -> None:
+    amt = transaction.amount / (len(transaction.users) + 1)
+    for user in users:
+        user.transactions.append(transaction)
+        statement = sql.update(TransactionUser).values(balance=amt).where(TransactionUser.user_id == user.id and TransactionUser.transaction_id == transaction.id)
+        db.session.execute(statement)
+
+def get_balance_for_transaction(user:User, transaction:Transaction) -> float:
+    statement = sql.select(TransactionUser).where(TransactionUser.user_id == user.id and TransactionUser.transaction_id == transaction.id)
+    balance = db.session.scalar(statement).balance
+    return balance
 
 def calculate_money_owed_by_user(user:User) -> float:
     # Calculate the amount the user owes to others
     total = 0
-    for transaction in user.transactions_due:
+    for transaction in user.transactions:
         total += transaction.amount / len(transaction.users)
     return total
 
@@ -57,15 +68,12 @@ def net_balance(user:User) -> float:
 def pay_transaction(user:User, transaction:Transaction) -> None:
     #Allow for a user to pay for a single transaction
     #TODO: add proper error handling
-    if not (transaction in user.transactions):
+    if transaction not in user.transactions:
         raise InvalidFieldError("User is not a part of this transaction")
-    elif not (transaction in user.transactions_due):
-        raise InvalidFieldError("User has already paid for this transaction")
-    else:
-        user.balance -= transaction.amount
-        transaction.users_due.remove(user)
+    balance = -get_balance_for_transaction(user, transaction)
+    update_user_balance(user, balance)
 
 def pay_all_transactions_due(user:User) -> None:
     #Allow a user to pay all of their outstanding debts
-    for transaction in user.transactions_due:
+    for transaction in user.transactions:
         pay_transaction(user, transaction) #TODO: test and make sure this doesn't cause issues
