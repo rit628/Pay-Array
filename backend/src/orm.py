@@ -69,7 +69,8 @@ class User(Base):
     first_name = db.Column(db.String(50))
     last_name = db.Column(db.String(50))
     phone = db.Column(db.String(10))
-    budget = db.Column(db.DECIMAL)
+    budget = db.Column(db.DECIMAL(5,2))
+    balance = db.Column(db.DECIMAL(5,2))
     items = db.relationship('Item', secondary=user_preference, back_populates="users")
     transactions = db.relationship('Transaction', secondary=transaction_user, back_populates="users")
     transactions_due = db.relationship('Transaction', secondary=transaction_user_due, back_populates="users_due")
@@ -78,14 +79,14 @@ class Item(Base):
     __tablename__ = "item"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(100), nullable=False, unique=True)
-    price = db.Column(db.DECIMAL)
+    price = db.Column(db.DECIMAL(5,2))
     purchase_link = db.Column(db.String(2048))
     users = db.relationship('User', secondary=user_preference, back_populates="items")
 
 class Transaction(Base):
     __tablename__ = "transaction"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    amount = db.Column(db.DECIMAL, nullable=False)
+    amount = db.Column(db.DECIMAL(5,2), nullable=False)
     completed = db.Column(db.BOOLEAN, nullable=False)
     item_id = db.Column(db.Integer, nullable=False)
     purchaser_id = db.Column(db.Integer, nullable=False)
