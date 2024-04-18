@@ -1,5 +1,7 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link';
+
 
 const LoginPage: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -12,6 +14,7 @@ const LoginPage: React.FC = () => {
       setFormData({ ...formData, [name]: value });
     };
   
+    // headers
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       console.log(formData);
@@ -53,7 +56,9 @@ const LoginPage: React.FC = () => {
                   required
                 />
               </div>
+              <Link href="/user">
               <button type="submit" className="submit-button">Login</button>
+              </Link>
             </form>
           </div>
         </div>
