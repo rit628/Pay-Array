@@ -26,12 +26,15 @@ h1 {
   font-size: 50px;
 }
 
+h2 {
+  font-size: 35px;
+}
+
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
 }
 
 .button-container {
@@ -59,14 +62,6 @@ h1 {
   align-items: center;
   justify-content: center;
   background-color: #f0f0f0;
-}
-
-.loginContainer {
-  background-color: #fff;
-  padding: 32px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 24rem;
 }
 
 .title {
@@ -97,25 +92,190 @@ h1 {
   outline: none;
 }
 
-.submitButton {
+.submit-button {
   width: 100%;
   padding: 8px;
-  background-color: #4299e1;
+  background-color: #091A03;
   color: #fff;
   border: none;
   border-radius: 4px;
+  margin-top: 10px;
   cursor: pointer;
   outline: none;
 }
 
-.submitButton:hover {
-  background-color: #3182ce;
+.submit-button:hover {
+  background-color: #E4EFE1;
+  color: #091A03;
 }
 
 .login-container {
   background-color: #fff;
-  padding: 32px;
+  padding: 5vw;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add box-shadow to create a box around the login page */
+  width: 30%;
+}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: #f0f0f0;
+}
+
+.container {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav {
+  background-color: #091A03;
+  color: #E4EFE1;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 2rem;
+  padding: 0 1rem;
+}
+
+.site-title {
+  font-size: 2rem;
+}
+
+.nav ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+}
+
+.nav a {
+  color: inherit;
+  text-decoration: none;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: .25rem;
+}
+
+.nav li.active {
+  color: #E4EFE1;
+}
+
+.nav li:hover {
+  color: #1a560a;
+}
+
+.customButton {
   width: 24rem;
+}
+
+/*userPage styling*/
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  left: 0px;
+  padding: 20px;
+}
+
+.userButtonGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.userButton {
+  display: inline-block;
+  padding: 25px 70px; 
+  font-size: 18px; 
+  background-color: #d1f0d7;
+  color: #0f3a12;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-right: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+  width: 220px;
+}
+
+.userButton:hover {
+  background-color: #054330;
+  color: #d1f0d7; 
+}
+
+.helloUsername{
+  font-size: x-large;
+  padding-bottom: 40px;
+  text-align: left;
+}
+
+.transactionContent{
+  flex-direction: column;
+  position: absolute;
+  left: 450px;
+  top:70px;
+
+}
+
+.transactionTitle{
+  font-size: x-large;
+}
+
+/*payRequest page*/
+.payReqTitle{
+  text-align: center;
+}
+
+.payReqButton{
+  flex: 1; /* Each button takes equal space */
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #d1f0d7;
+  color: #0f3a12;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.payReqButton:hover{
+  background-color: #054330;
+  color: #d1f0d7; 
+}
+
+.info {
+  display: flex;
+}
+
+.card {
+  padding: 10px;
+  margin: 10px;
+  display: flex;
+  background-color: #091A03;
+  color: #d1f0d7;
+}
+
+.payReqButtons{
+  display: flex;
+  justify-content: space-between; 
+  margin-top: 20px; 
+}
+
+.moneyAmount{
+  font-size: 70px;
+}
+
+.page-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  margin-bottom: 10px;
+  gap: 20px;
 }

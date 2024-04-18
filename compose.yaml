@@ -62,6 +62,8 @@ services:
       - MYSQL_TCP_PORT=${DATABASE_CONTAINER_PORT}
     healthcheck:
         test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        start_period: 30s
+        start_interval: 1s
         timeout: 5s
         retries: 10
     env_file:

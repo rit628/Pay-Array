@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link';
 
 const SignUpPage: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -21,6 +22,8 @@ const SignUpPage: React.FC = () => {
     };
   
     return (
+      <>
+      <title>Sign Up | PayArray</title>
         <div className="container">
           <div className="login-container">
             <h2 className="title">Sign Up</h2>
@@ -85,10 +88,13 @@ const SignUpPage: React.FC = () => {
                   required
                 />
               </div>
+              <Link href='/joinhouse'>
               <button type="submit" className="submit-button">Sign Up</button>
+              </Link>
             </form>
           </div>
         </div>
+        </>
       );
     };
   
