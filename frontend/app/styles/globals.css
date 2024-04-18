@@ -26,6 +26,10 @@ h1 {
   font-size: 50px;
 }
 
+h2 {
+  font-size: 35px;
+}
+
 .container {
   display: flex;
   flex-direction: column;
@@ -240,12 +244,6 @@ body {
   margin-right: 10px;
 }
 
-.customButton:hover {
-  width: 200px;
-  height: 30px;
-
-}
-
 .payReqButton:hover{
   background-color: #054330;
   color: #d1f0d7; 
@@ -273,5 +271,11 @@ body {
   font-size: 70px;
 }
 
-
-
+.page-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  margin-bottom: 10px;
+  gap: 20px;
+}
