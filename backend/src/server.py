@@ -6,7 +6,7 @@ import re
 from .auth import *
 from xxhash import xxh32
 import redis
-from .orm import db, User, Item, Transaction, transaction_user, transaction_user_due, user_preference
+from .orm import db, User, Item, Transaction, user_preference
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
 from .transactions import *
@@ -238,11 +238,16 @@ def create_app(name=__name__, testing=False):
             data.pop('users')
             transaction = Transaction(**data)
             user.transactions.append(transaction)
-            for u in users:
-                u.transactions.append(transaction)
-                u.transactions_due.append(transaction)
+            set_transaction_debts(transaction, users)
             db.session.commit()
             return jsonify(f"Transaction complete."), 200
+        
+    @app.route(f"{API_ROOT_PATH}/users/me/transactions/due/", methods=['GET'])
+    def transactions_due():
+        user = get_request_user()
+        if request.method == "GET":
+            transactions = [transaction.to_dict() for transaction in user.transactions_due]
+            return jsonify(transactions), 200
     
     @app.route(f"{API_ROOT_PATH}/users/me/transactions/<int:id>/", methods=['GET'])
     def transaction_get(id:int):
@@ -257,6 +262,7 @@ def create_app(name=__name__, testing=False):
         user = get_request_user()
         transaction = get_transaction_by_id(id)
         pay_transaction(user, transaction)
+        db.session.commit()
         return jsonify("Transaction paid successfully."), 200
 
     @app.route(f"{API_ROOT_PATH}/users/me/transactions/pay/<username>/", methods=['POST'])
@@ -266,6 +272,7 @@ def create_app(name=__name__, testing=False):
         transactions = list(filter(lambda t : t.purchaser_id == purchaser_id, user.transactions_due))
         for transaction in transactions:
             pay_transaction(user, transaction)
+        db.session.commit()
         return jsonify(f"Transactions owed to {username} paid successfully."), 200
 
     @app.route(f"{API_ROOT_PATH}/users/me/<resource>/", methods=["GET", "POST", "DELETE"])
