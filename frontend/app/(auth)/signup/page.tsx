@@ -1,8 +1,10 @@
 'use client'
 import { useState } from 'react'
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const SignUpPage: React.FC = () => {
+    const router = useRouter();
+
     const [formData, setFormData] = useState({
       email: '',
       username: '',
@@ -15,10 +17,44 @@ const SignUpPage: React.FC = () => {
       setFormData({ ...formData, [name]: value });
     };
   
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       console.log(formData);
-      // logic
+      if (formData.password === formData.confirmPassword) {
+        const userData = {
+          "email": formData.email,
+          "username": formData.username,
+          "password": formData.password
+        };
+        let response = await fetch(`${process.env.API_URL}/users/`, {
+          "method": "POST",
+          "mode": "cors",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": JSON.stringify(userData)
+        })
+
+        let data = await response.json();
+        console.log(data);
+        if (!response.ok) {
+          return;
+        }
+        response = await fetch(`${process.env.API_URL}/login/`, {
+            "method": "POST",
+            "mode": "cors",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": JSON.stringify(userData)
+          });
+        const header = await response.json();
+        localStorage.setItem('auth-header', header);
+        localStorage.setItem('username', formData.username);
+        if (response.ok) {
+          router.push("/user");
+        }
+      }
     };
   
     return (
@@ -88,9 +124,7 @@ const SignUpPage: React.FC = () => {
                   required
                 />
               </div>
-              <Link href='/joinhouse'>
               <button type="submit" className="submit-button">Sign Up</button>
-              </Link>
             </form>
           </div>
         </div>
