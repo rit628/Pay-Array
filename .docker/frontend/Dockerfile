@@ -9,4 +9,5 @@ COPY ./frontend/package.json ./frontend/package-lock.jso[n] ./frontend/pnpm-lock
 RUN apt-get update && \
 apt-get upgrade -y && \
 npm install -g pnpm && \
+pnpm import && \
 pnpm install

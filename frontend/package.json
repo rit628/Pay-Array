@@ -10,13 +10,20 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@emotion/cache": "^11.11.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/material": "^5.15.15",
+    "@mui/material-nextjs": "^5.15.11",
+    "@mui/styled-engine-sc": "^6.0.0-alpha.18",
     "next": "14.1.0",
     "react": "^18.2.0",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "styled-components": "^6.1.8"
   },
   "devDependencies": {
     "@testing-library/react": "^14.2.1",
-    "@types/node": "^20",
+    "@types/node": "^20.11.16",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@vitejs/plugin-react": "^4.2.1",
