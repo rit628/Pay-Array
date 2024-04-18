@@ -4,9 +4,12 @@ import sqlalchemy as sql
 import os
 import re
 from .auth import *
-from .orm import db, User, Item
+from xxhash import xxh32
+import redis
+from .orm import db, User, Item, Transaction, user_preference
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
+from .transactions import *
 
 def create_app(name=__name__, testing=False):
     dupe_error_msg = re.compile(R"Duplicate entry \'([^\']*)\'")
@@ -16,20 +19,25 @@ def create_app(name=__name__, testing=False):
     API_VERSION = os.environ.get("API_VERSION")
     API_ROOT_PATH = f"/api/{API_VERSION}"
 
+    CACHE_HOSTNAME = os.environ.get("CACHE_CONTAINER_NAME")
+    CACHE_PORT = os.environ.get("CACHE_CONTAINER_PORT")
+    CACHE_DB = 0 if not testing else 1
+
     RDBMS = "mysql"
     DRIVER = "mysqlconnector"
-    HOSTNAME = os.environ.get("DATABASE_CONTAINER_NAME")
+    DATABASE_HOSTNAME = os.environ.get("DATABASE_CONTAINER_NAME")
     USERNAME = os.environ.get("DATABASE_USER")
     PASSWORD = os.environ.get("MYSQL_ROOT_PASSWORD")
-    PORT = os.environ.get("DATABASE_CONTAINER_PORT")
+    DATABASE_PORT = os.environ.get("DATABASE_CONTAINER_PORT")
     DATABASE_PRODUCTION = os.environ.get('DATABASE_NAME_PRODUCTION')
     DATABASE_TEST = os.environ.get('DATABASE_NAME_TEST')
 
-    PRODUCTION_URI = f"{RDBMS}+{DRIVER}://{USERNAME}:{PASSWORD}@{HOSTNAME}:{PORT}/{DATABASE_PRODUCTION}"
-    TEST_URI = f"{RDBMS}+{DRIVER}://{USERNAME}:{PASSWORD}@{HOSTNAME}:{PORT}/{DATABASE_TEST}"
+    PRODUCTION_URI = f"{RDBMS}+{DRIVER}://{USERNAME}:{PASSWORD}@{DATABASE_HOSTNAME}:{DATABASE_PORT}/{DATABASE_PRODUCTION}"
+    TEST_URI = f"{RDBMS}+{DRIVER}://{USERNAME}:{PASSWORD}@{DATABASE_HOSTNAME}:{DATABASE_PORT}/{DATABASE_TEST}"
 
     app = Flask(name)
     CORS(app)
+    cache = redis.Redis(host=CACHE_HOSTNAME, port=CACHE_PORT, db=CACHE_DB)
     app.config["SQLALCHEMY_DATABASE_URI"] = PRODUCTION_URI if not testing else TEST_URI
     db.init_app(app)        
 
@@ -58,9 +66,33 @@ def create_app(name=__name__, testing=False):
             User: User object associated with id provided in authorization header.
         """
         token = get_auth_token()
+        if cache.get(xxh32(token).hexdigest()) is not None:
+            raise AuthenticationError("Invalid Token.")
         id = decode_token(token)["user_id"]
         user = db.get_or_404(User, id, description="User does not exist.")
         return user
+    
+    def get_user_by_username(username:str) -> User:
+        statement = sql.select(User).where(User.username == username)
+        user = db.session.scalar(statement)
+        if user is None: # guard if user is not found
+            raise NotFound(f"No Account with Username: {username}.")
+        return user
+
+    def get_item_by_name(name:str) -> Item:
+        """Gets the item object with the given name.
+
+        Args:
+            name (str): Name of the item.
+
+        Returns:
+            Item: Item object with given name.
+        """
+        statement = sql.select(Item).where(Item.name == name)
+        item = db.session.scalar(statement)
+        if item is None:
+            return jsonify(f"Item {name} not found."), 404
+        return item
 
     @app.errorhandler(InvalidFieldError)
     def handle_invalid_field_error(error):
@@ -91,38 +123,26 @@ def create_app(name=__name__, testing=False):
         return response
     
     @app.errorhandler(NotFound)
-    def handle_notfound_error(error):
+    def handle_not_found_error(error):
         response = jsonify(error.description)
         response.status_code = 404
         return response
-
-    @app.route("/validate-server-runtime/", methods=["GET"])
-    def validate_server_runtime():
-        return jsonify("Hello World!"), 200
-
-    @app.route("/validate-db-connection/", methods=["GET"])
-    def validate_db_connection():
-        tables = db.engine.connect().execute(sql.text("SHOW TABLES"))
-        result = [tuple(i) for i in tables.fetchall()]
-        return jsonify(result), 200
 
     @app.route(f"{API_ROOT_PATH}/login/", methods=["POST"])
     def login():
         supplied_credentials = request.get_json()
         username = supplied_credentials["username"]
         password = supplied_credentials["password"]
-        statement = sql.select(User).where(User.username == username)
-        user = db.session.scalars(statement).first()
-        if user is None:    # guard if user is not found
-            return jsonify(f"No Account with Username: {username}."), 404
+        user = get_user_by_username(username)
         token = authenticate_user(user, password)
         response = f"{AUTH_TYPE} {token}"
         return jsonify(response), 201
 
     @app.route(f"{API_ROOT_PATH}/logout/", methods=["DELETE"])
     def logout():
-        # TODO: Add a cache database to invalidate tokens post logout
         token = get_auth_token()
+        exp_time = decode_token(token)["exp"]
+        cache.set(xxh32(token).hexdigest(), 0, exat=exp_time)
         return jsonify("Logout Successful."), 200
 
     @app.route(f"{API_ROOT_PATH}/users/", methods=["POST"])
@@ -167,8 +187,94 @@ def create_app(name=__name__, testing=False):
             db.session.delete(user)
             db.session.commit()
             return jsonify("User Deleted Successfully."), 200
-            
     
+    @app.route(f"{API_ROOT_PATH}/users/me/preferences/", methods=["GET", "POST", "DELETE"])
+    def user_preferences():
+        user = get_request_user()
+        if request.method == "GET":
+            items = [item.to_dict() for item in user.items]
+            return jsonify(items), 200
+        elif request.method == "POST":
+            data = request.get_json()
+            item = Item(**data)
+            user.items.append(item)
+            db.session.commit()
+            return jsonify(f"{item.name} added to {user.username}'s  preferences"), 200
+        elif request.method == "DELETE":
+            user.items.clear()
+            db.session.commit()
+            return jsonify(f"{user.username}'s item preferences cleared successfully."), 200
+    
+    @app.route(f"{API_ROOT_PATH}/users/me/preferences/<item>/", methods=["GET", "POST", "DELETE"])
+    def user_preferences_item(item:str):
+        user = get_request_user()
+        if request.method == "GET":
+            statement = sql.select(Item).where(Item.name == item).join(user_preference).join(User).where(User.id == user.id)           
+            requested_item = db.session.scalar(statement)
+            if requested_item is None:
+                return jsonify(f"Item {item} not in {user.username}'s prefrences."), 404
+            return jsonify(requested_item.to_dict()), 200
+        elif request.method == "POST":
+            retreived_item = get_item_by_name(item)
+            user.items.append(retreived_item)
+            db.session.commit()
+            return f"{item.name} added to {user.username}'s  preferences.", 200
+        elif request.method == "DELETE":
+            retreived_item = get_item_by_name(item)
+            user.items.remove(item)
+            db.session.commit()
+            return jsonify(f"{user.username}'s item preference for {item} removed successfully."), 200
+        
+    @app.route(f"{API_ROOT_PATH}/users/me/transactions/", methods=['GET', 'POST'])
+    def transactions():
+        user = get_request_user()
+        if request.method == "GET":
+            transactions = [transaction.to_dict() for transaction in user.transactions]
+            return jsonify(transactions), 200
+        elif request.method == "POST":
+            data = request.get_json()
+            data.update({"purchaser_id": user.id, "completed": False})
+            users = [get_user_by_username(u) for u in data['users']]
+            data.pop('users')
+            transaction = Transaction(**data)
+            user.transactions.append(transaction)
+            set_transaction_debts(transaction, users)
+            db.session.commit()
+            return jsonify(f"Transaction complete."), 200
+        
+    @app.route(f"{API_ROOT_PATH}/users/me/transactions/due/", methods=['GET'])
+    def transactions_due():
+        user = get_request_user()
+        if request.method == "GET":
+            transactions = [transaction.to_dict() for transaction in user.transactions_due]
+            return jsonify(transactions), 200
+    
+    @app.route(f"{API_ROOT_PATH}/users/me/transactions/<int:id>/", methods=['GET'])
+    def transaction_get(id:int):
+        user = get_request_user()
+        transaction = get_transaction_by_id(id)
+        if transaction not in user.transactions:
+            raise InvalidFieldError(f"User is not a part of transaction {id}")
+        return jsonify(transaction.to_dict()), 200
+    
+    @app.route(f"{API_ROOT_PATH}/users/me/transactions/<int:id>/pay/", methods=['POST'])
+    def transaction_pay(id:int):
+        user = get_request_user()
+        transaction = get_transaction_by_id(id)
+        pay_transaction(user, transaction)
+        db.session.commit()
+        return jsonify("Transaction paid successfully."), 200
+
+    @app.route(f"{API_ROOT_PATH}/users/me/transactions/pay/<username>/", methods=['POST'])
+    def transaction_pay_user(username:int):
+        user = get_request_user()
+        purchaser_id = get_user_by_username(username).id
+        transactions = list(filter(lambda t : t.purchaser_id == purchaser_id, user.transactions_due))
+        for transaction in transactions:
+            pay_transaction(user, transaction)
+        db.session.commit()
+        return jsonify(f"Transactions owed to {username} paid successfully."), 200
+
     @app.route(f"{API_ROOT_PATH}/users/me/<resource>/", methods=["GET", "POST", "DELETE"])
     def user_resource_access(resource:str):
         user = get_request_user()
@@ -191,6 +297,13 @@ def create_app(name=__name__, testing=False):
             db.session.commit()
             return jsonify(f"User's {resource} Deleted Successfully."), 200
     
+    @app.route(f"{API_ROOT_PATH}/users/household/<int:id>", methods=["GET"])
+    def household_users(id:int):
+        if request.method == "GET":
+            statement = sql.select(User).where(User.household_id == id)
+            members = db.session.scalars(statement).all()
+            return jsonify([member.to_dict() for member in members])
+
     @app.route("/debug/", methods=["GET"])
     def debug():
         statement = sql.select(User)
