@@ -25,6 +25,7 @@ jobs:
         run: |
           touch .env.local
           echo MYSQL_ROOT_PASSWORD=${{secrets.MYSQL_ROOT_PASSWORD}} > .env.local
+          echo JSON_WEB_TOKEN_KEY=${{secrets.JSON_WEB_TOKEN_KEY}} >> .env.local
 
       - name: Build Containers
         run: docker compose up -d

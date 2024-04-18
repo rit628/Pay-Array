@@ -1,13 +1,15 @@
 CREATE TABLE user (
     id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    group_id INT,
+    username VARCHAR(50) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    password_hash BINARY(32) NOT NULL,
+    salt BINARY(32) NOT NULL,
+    household_id INT,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     phone CHAR(10),
-    email VARCHAR(255),
-    salt BINARY(32),
-    password_hash BINARY(32),
-    budget DECIMAL(5,2) UNSIGNED
+    budget DECIMAL(5,2) UNSIGNED,
+    UNIQUE(username)
 );
 
 CREATE TABLE item (
