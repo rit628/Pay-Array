@@ -12,10 +12,10 @@ const JoinHouse = () => {
       <p>there is some quick blurb here</p>
       <div className="button-container">
         <Link href="/createhouse" legacyBehavior>
-          <Button className="customButton">Create a Household</Button>
+          <Button className="submit-button">Create a Household</Button>
         </Link>
         <Link href="/enterhouse" legacyBehavior>
-            <Button type="submit" className="customButton">Enter House Code</Button>
+            <Button className="submit-button">Enter House Code</Button>
         </Link>
       </div>
     </div>

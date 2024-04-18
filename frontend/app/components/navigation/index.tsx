@@ -1,18 +1,16 @@
 // App.tsx
 import React from "react";
 import Navbar from "./navigationBar";
-import Home from "../../home/page";
-import Landing from "../../request/page";
-import Profile from "../../profile/page";
+import Household from "../../household/page"
+import User from "../../user/page";
 
 export default function App() {
   return (
     <>
       <Navbar />
       <div className="container">
-        <Home />
-        <Landing />
-        <Profile />
+        <Household />
+        <User />
       </div>
     </>
   );

@@ -1,7 +1,6 @@
 import Head from "next/head";
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import Button from '@mui/material/Button';
 import Link from 'next/link'
 
 const OpenScreen = () => {
@@ -11,15 +10,19 @@ const OpenScreen = () => {
         <title>PayArray</title>
       </Head>
       <h1>PayArray</h1>
-      <p>Split costs with your rommates effortlessly</p>
+      <p>Split costs with your roomates effortlessly</p>
+      <div className="page-container">
+        <Link href="signup"><button type="submit" className="submit-button">Sign Up</button></Link>
+        <Link href="login"><button type="submit" className="submit-button">Log In</button></Link>
+      </div>
+      <br></br>
+      <br></br>
       <h2>Features</h2>
-      <Link href="signup">
-        <Button className="customButton">Sign Up</Button>
-      </Link>
       <div className="info">
-      <Card className="card">Test</Card>
-      <Card className="card">Another Test</Card>
-      <Card className="card">More Tests</Card>
+      <Card className="card">
+          <p>something about being able to split with roommates</p>
+      </Card>
+      <Card className="card">easy way to connect with roommates</Card>
       </div>
     </div>
   );
