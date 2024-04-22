@@ -1,9 +1,12 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 
 const LoginPage: React.FC = () => {
+    const router = useRouter();
+    
     const [formData, setFormData] = useState({
       username: '',
       password: '',
@@ -15,10 +18,27 @@ const LoginPage: React.FC = () => {
     };
   
     // headers
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       console.log(formData);
-      // logic
+      const userData = {
+        "username": formData.username,
+        "password": formData.password
+      };
+      const response = await fetch(`${process.env.API_URL}/login/`, {
+        "method": "POST",
+        "mode": "cors",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": JSON.stringify(userData)
+      });
+      const header = await response.json();
+      localStorage.setItem('auth-header', header);
+      localStorage.setItem('username', formData.username);
+      if (response.ok) {
+        router.push("/user");
+      }
     };
   
     return (
@@ -56,9 +76,7 @@ const LoginPage: React.FC = () => {
                   required
                 />
               </div>
-              <Link href="/user">
               <button type="submit" className="submit-button">Login</button>
-              </Link>
             </form>
           </div>
         </div>

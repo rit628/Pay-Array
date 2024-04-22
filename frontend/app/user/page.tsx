@@ -7,7 +7,7 @@ const UserLandingPage: React.FC = () => {
     return (
       <div className="container">
       <div className="sidebar">
-          <h1 className="helloUsername">Hello (username)!</h1>
+          <h1 className="helloUsername">Hello {localStorage.getItem('username')}!</h1>
           <div className="userButtonGroup">
             <Link href= "/pay">
             <button className="userButton w-full">Pay</button>
