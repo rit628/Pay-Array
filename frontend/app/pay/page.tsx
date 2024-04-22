@@ -1,8 +1,6 @@
 'use client'
-import React, { useState } from 'react';
-
-import React, { useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
+import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 
 const Pay: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -10,11 +8,52 @@ const Pay: React.FC = () => {
     msg: '',
   });
 
+  // State to hold household users
+  const [householdUsers, setHouseholdUsers] = useState([]);
+
+  // Function to fetch household users
+  const getHouseholdUsers = async () => {
+    try {
+      const header = localStorage.getItem("auth-header")|| '';
+      const response = await fetch(`${process.env.API_URL}/users/me/household_id`, {
+        method: "GET",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": header
+        }
+      });
+
+      const userHouseholdId = await response.json();
+
+      const response2 = await fetch(`${process.env.API_URL}/users/household/${userHouseholdId}`, {
+        method: "GET",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": header
+        }
+      });
+
+      const householdUsers = await response2.json();
+      setHouseholdUsers(householdUsers);
+    } catch (error) {
+      console.error("Error fetching household users:", error);
+    }
+  };
+
+  useEffect(() => {
+    // erm
+    getHouseholdUsers();
+  }, []); 
+
+  // Handle form change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle form submission
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(formData);
@@ -25,6 +64,8 @@ const Pay: React.FC = () => {
     <div className='container'>
       <h1 className='payReqTitle'>Let's Pay!</h1>
       <div className='payReqButtons'>
+        
+
         <button className='payReqButton w-full'>Pay</button>
       </div>
     </div>
