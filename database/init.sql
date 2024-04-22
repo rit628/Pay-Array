@@ -1,3 +1,7 @@
+CREATE TABLE household {
+    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL
+};
+
 CREATE TABLE user (
     id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
     username VARCHAR(50) NOT NULL,
@@ -10,6 +14,7 @@ CREATE TABLE user (
     phone CHAR(10),
     balance DECIMAL(5,2) UNSIGNED,
     UNIQUE(username)
+    FOREIGN KEY (household_id) REFERENCES household(id)
 );
 
 CREATE TABLE item (

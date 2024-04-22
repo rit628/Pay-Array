@@ -6,7 +6,7 @@ import re
 from .auth import *
 from xxhash import xxh32
 import redis
-from .orm import db, User, Item, Transaction, user_preference
+from .orm import db, User, Item, Transaction, Household, user_preference
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
 from .transactions import *
@@ -297,12 +297,18 @@ def create_app(name=__name__, testing=False):
             db.session.commit()
             return jsonify(f"User's {resource} Deleted Successfully."), 200
     
+    @app.route(f"{API_ROOT_PATH}/users/household/create/", methods=["POST"])
+    def household_create():
+        household = Household()
+        db.session.add(household)
+        db.session.commit()
+        return jsonify(household.id), 201
+
     @app.route(f"{API_ROOT_PATH}/users/household/<int:id>", methods=["GET"])
     def household_users(id:int):
-        if request.method == "GET":
-            statement = sql.select(User).where(User.household_id == id)
-            members = db.session.scalars(statement).all()
-            return jsonify([member.to_dict() for member in members])
+        statement = sql.select(User).where(User.household_id == id)
+        members = db.session.scalars(statement).all()
+        return jsonify([member.to_dict() for member in members])
 
     @app.route("/debug/", methods=["GET"])
     def debug():
