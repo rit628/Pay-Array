@@ -40,7 +40,7 @@ def test_make_transaction(client):
         "Authorization" : auth_header
     }, json={
         "amount": 10.10,
-        "item_id": 1,
+        "message": "apples",
         "users": ["testUser1000"]
     })
 
@@ -57,6 +57,7 @@ def test_make_transaction(client):
             "id" : 1,
             "amount" : '10.10',
             "completed" : False,
+            "message" : "apples",
             "item_id" : 1,
             "purchaser_id" : 1
         }
@@ -67,15 +68,7 @@ def test_make_transaction(client):
     })
 
     assert response.status_code == 200
-    assert response.get_json() == [
-        {   
-            "id" : 1,
-            "amount" : '10.10',
-            "completed" : False,
-            "item_id" : 1,
-            "purchaser_id" : 1
-        }
-    ]
+    assert response.get_json() == []
 
     response = client.post(f"{API_ROOT_PATH}/login/", json={
         "username" : "testUser1000",
@@ -94,6 +87,7 @@ def test_make_transaction(client):
             "id" : 1,
             "amount" : '10.10',
             "completed" : False,
+            "message" : "apples",
             "item_id" : 1,
             "purchaser_id" : 1
         }
@@ -109,12 +103,13 @@ def test_make_transaction(client):
             "id" : 1,
             "amount" : '10.10',
             "completed" : False,
+            "message" : "apples",
             "item_id" : 1,
             "purchaser_id" : 1
         }
     ]
 
-def test_make_transaction(client):
+def test_pay_transaction(client):
     response = client.post(f"{API_ROOT_PATH}/users/", json={
         "username" : "testUser999",
         "email" : "testuser@domain.com",
@@ -151,7 +146,7 @@ def test_make_transaction(client):
         "Authorization" : auth_header
     }, json={
         "amount": 10.10,
-        "item_id": 1,
+        "message": "apples",
         "users": ["testUser1000"]
     })
 
@@ -168,11 +163,11 @@ def test_make_transaction(client):
             "id" : 1,
             "amount" : '10.10',
             "completed" : False,
+            "message" : "apples",
             "item_id" : 1,
             "purchaser_id" : 1
         }
     ]
-
 
     response = client.post(f"{API_ROOT_PATH}/login/", json={
         "username" : "testUser1000",
@@ -191,6 +186,7 @@ def test_make_transaction(client):
             "id" : 1,
             "amount" : '10.10',
             "completed" : False,
+            "message" : "apples",
             "item_id" : 1,
             "purchaser_id" : 1
         }

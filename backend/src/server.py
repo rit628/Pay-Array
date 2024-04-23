@@ -236,6 +236,10 @@ def create_app(name=__name__, testing=False):
             data.update({"purchaser_id": user.id, "completed": False})
             users = [get_user_by_username(u) for u in data['users']]
             data.pop('users')
+            message = data['message']
+            item_id = get_closest_item_id(message)
+            item_id = item_id if item_id else set_item(message, data['amount'])
+            data.update({"item_id" : item_id})
             transaction = Transaction(**data)
             user.transactions.append(transaction)
             set_transaction_debts(transaction, users)
