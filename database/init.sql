@@ -36,7 +36,7 @@ CREATE TABLE transaction (
 CREATE TABLE transaction_user (
     transaction_id INT NOT NULL,
     user_id INT NOT NULL,
-    balance DECIMAL(5,2) NOT NULL,
+    balance DECIMAL(5,2) NOT NULL DEFAULT 0.00,
     FOREIGN KEY (transaction_id) REFERENCES transaction(id),
     FOREIGN KEY (user_id) REFERENCES user(id)
 );

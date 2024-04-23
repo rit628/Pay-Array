@@ -44,6 +44,11 @@ def get_balance_for_transaction(user:User, transaction:Transaction) -> float:
     balance = db.session.scalar(statement).balance
     return balance
 
+def get_transactions_due(user:User) -> list[Transaction]:
+    statement = sql.select(Transaction).join(TransactionUser).filter(TransactionUser.user_id == 4, TransactionUser.balance > 0)
+    transactions = db.session.scalars(statement).all()
+    return transactions
+
 def calculate_money_owed_by_user(user:User) -> float:
     # Calculate the amount the user owes to others
     total = 0

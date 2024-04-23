@@ -52,7 +52,7 @@ class TransactionUser(Base):
     __tablename__ = 'transaction_user'
     transaction_id = db.mapped_column(db.ForeignKey("transaction.id"), primary_key=True)
     user_id = db.mapped_column(db.ForeignKey("user.id"), primary_key=True)
-    balance = db.Column(db.DECIMAL(5,2))
+    balance = db.Column(db.DECIMAL(5,2), default=0)
 
 class Household(Base):
     __tablename__ = "household"

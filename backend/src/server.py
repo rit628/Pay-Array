@@ -246,7 +246,7 @@ def create_app(name=__name__, testing=False):
     def transactions_due():
         user = get_request_user()
         if request.method == "GET":
-            transactions = [transaction.to_dict() for transaction in user.transactions_due]
+            transactions = [t.to_dict() for t in get_transactions_due(user)]
             return jsonify(transactions), 200
     
     @app.route(f"{API_ROOT_PATH}/users/me/transactions/<int:id>/", methods=['GET'])
