@@ -52,7 +52,7 @@ class TransactionUser(Base):
     __tablename__ = 'transaction_user'
     transaction_id = db.mapped_column(db.ForeignKey("transaction.id"), primary_key=True)
     user_id = db.mapped_column(db.ForeignKey("user.id"), primary_key=True)
-    balance = db.Column(db.DECIMAL(5,2), default=0)
+    balance = db.Column(db.DECIMAL(10,2), default=0)
 
 class Household(Base):
     __tablename__ = "household"
@@ -69,7 +69,7 @@ class User(Base):
     first_name = db.Column(db.String(50))
     last_name = db.Column(db.String(50))
     phone = db.Column(db.String(10))
-    balance = db.Column(db.DECIMAL(5,2), default=0)
+    balance = db.Column(db.DECIMAL(10,2), default=0)
     items = db.relationship('Item', secondary=user_preference, back_populates="users")
     transactions = db.relationship('Transaction', secondary="transaction_user", back_populates="users")
 
@@ -77,13 +77,13 @@ class Item(Base):
     __tablename__ = "item"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(100), nullable=False, unique=True)
-    price = db.Column(db.DECIMAL(5,2))
+    price = db.Column(db.DECIMAL(10,2))
     users = db.relationship('User', secondary=user_preference, back_populates="items")
 
 class Transaction(Base):
     __tablename__ = "transaction"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    amount = db.Column(db.DECIMAL(5,2), nullable=False)
+    amount = db.Column(db.DECIMAL(10,2), nullable=False)
     completed = db.Column(db.BOOLEAN, nullable=False)
     message = db.Column(db.String(1000), nullable=False, default="")
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'))

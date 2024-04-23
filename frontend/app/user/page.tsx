@@ -20,6 +20,7 @@ const UserLandingPage: React.FC = () => {
           }
         });
         const data = await response.json();
+        console.log(data);
         setTransactions(data);
       } catch (error) {
         console.error('Error fetching Transactions:', error);

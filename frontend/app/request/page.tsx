@@ -1,18 +1,18 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import DynamicSingleSelectDropdown from '../components/singleDropdown/dynamicSingleSelectDropdown';
-
+import DynamicSingleSelectDropdown from '../components/userDropdown/userSelectDropdown';
 
 const Pay: React.FC = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
     amount: '',
-    users: [],
+    users: [''],
     message: '',
   });
 
   const [householdUsers, setHouseholdUsers] = useState([]);
+  const [debtUsers, setDebtUsers] = useState(['']);
 
   useEffect(() => {
     const fetchHouseholdUsers = async () => {
@@ -34,6 +34,15 @@ const Pay: React.FC = () => {
     fetchHouseholdUsers();
   }, [])
 
+  const handleSelect = (value: any) => {
+    if (!Array.isArray(value)) {
+      console.log('single select error on request');
+    } else {
+      // multi-select case
+      setDebtUsers(value);
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -41,6 +50,7 @@ const Pay: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    formData.users = debtUsers;
     console.log(formData);
     const header : any = localStorage.getItem('auth-header');
     const response = await fetch(`${process.env.API_URL}/users/me/transactions/`, {
@@ -81,7 +91,7 @@ const Pay: React.FC = () => {
           <label htmlFor="users" className="users">
             To:
           </label>
-          <DynamicSingleSelectDropdown label="Who are you sending the request to?" options={householdUsers}></DynamicSingleSelectDropdown>
+          <DynamicSingleSelectDropdown label="Who are you sending the request to?" options={householdUsers} onSelect={handleSelect} multiSelect={true}></DynamicSingleSelectDropdown>
         </div>
         <div className="form-group">
           <label htmlFor="message" className="message">
