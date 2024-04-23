@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import DynamicSingleSelectDropdown from '../components/singleDropdown/dynamicSingleSelectDropdown'; 
+
 
 const Pay: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -64,8 +65,7 @@ const Pay: React.FC = () => {
     <div className='container'>
       <h1 className='payReqTitle'>Let's Pay!</h1>
       <div className='payReqButtons'>
-        
-
+      <DynamicSingleSelectDropdown options={householdUsers} label="Select User" />
         <button className='payReqButton w-full'>Pay</button>
       </div>
     </div>
