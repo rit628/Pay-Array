@@ -233,7 +233,7 @@ def create_app(name=__name__, testing=False):
             return jsonify(transactions), 200
         elif request.method == "POST":
             data = request.get_json()
-            data.update({"purchaser_id": user.id, "completed": False})
+            data.update({"purchaser_id": user.id, "completed": False, "purchaser": user.username})
             data['amount'] = float(data['amount'])
             users = [get_user_by_username(u) for u in data['users']]
             data.pop('users')
