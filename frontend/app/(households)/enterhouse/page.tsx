@@ -1,10 +1,14 @@
 'use client'
 import { useState } from 'react'
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 
 const EnterHouse: React.FC = () => {
+    const router = useRouter();
+    const prepopulatedId = localStorage.getItem("household-id-temp");
+    localStorage.removeItem("household-id-temp");
     const [formData, setFormData] = useState({
-      houseCode: '',
+      houseCode: (prepopulatedId) ? prepopulatedId : '',
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -12,10 +16,23 @@ const EnterHouse: React.FC = () => {
         setFormData({ ...formData, [name]: value });
       };
     
-      const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+      const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log(formData);
-        // logic
+        const header : any = localStorage.getItem('auth-header');
+        const response = await fetch(`${process.env.API_URL}/users/me/household_id/`, {
+          "method": "POST",
+          "mode": "cors",
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": header
+          },
+          "body": JSON.stringify(formData.houseCode)
+        });
+        await response.json();
+        if (response.ok) {
+          router.push("/user");
+        }
       };
   
     return (
