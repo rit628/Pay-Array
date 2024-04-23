@@ -1,8 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import DynamicSingleSelectDropdown from '../components/userDropdown/userSelectDropdown'; 
-
-import React, { useState } from 'react';
+import DynamicSingleSelectDropdown from '../components/singleDropdown/dynamicSingleSelectDropdown'; 
 
 
 const Pay: React.FC = () => {
