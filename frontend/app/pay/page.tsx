@@ -61,11 +61,17 @@ const Pay: React.FC = () => {
     // logic
   };
 
+  const [selectedOption, setSelectedOption] = useState<string | number>('');
+
+  const handleSelect = (value: string | number) => {
+    setSelectedOption(value);
+  }
+
   return (
     <div className='container'>
       <h1 className='payReqTitle'>Let's Pay!</h1>
       <div className='payReqButtons'>
-      <DynamicSingleSelectDropdown options={householdUsers} label="Select User" />
+      <DynamicSingleSelectDropdown options={householdUsers} label="Select User" onSelect={handleSelect} />
         <button className='payReqButton w-full'>Pay</button>
       </div>
     </div>
