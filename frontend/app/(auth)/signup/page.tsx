@@ -50,7 +50,6 @@ const SignUpPage: React.FC = () => {
           });
         const header = await response.json();
         localStorage.setItem('auth-header', header);
-        localStorage.setItem('username', formData.username);
         if (response.ok) {
           router.push("/joinhouse");
         }
