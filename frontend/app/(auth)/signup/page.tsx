@@ -52,7 +52,7 @@ const SignUpPage: React.FC = () => {
         localStorage.setItem('auth-header', header);
         localStorage.setItem('username', formData.username);
         if (response.ok) {
-          router.push("/user");
+          router.push("/joinhouse");
         }
       }
     };
