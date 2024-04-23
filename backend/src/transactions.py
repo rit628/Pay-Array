@@ -86,11 +86,11 @@ def set_transaction_debts(transaction:Transaction, users:list[User]) -> None:
     amt = transaction.amount / (len(transaction.users) + 1)
     for user in users:
         user.transactions.append(transaction)
-        statement = sql.update(TransactionUser).values(balance=amt).where(TransactionUser.user_id == user.id and TransactionUser.transaction_id == transaction.id)
+        statement = sql.update(TransactionUser).values(balance=amt).where(TransactionUser.user_id == user.id, TransactionUser.transaction_id == transaction.id)
         db.session.execute(statement)
 
 def get_balance_for_transaction(user:User, transaction:Transaction) -> float:
-    statement = sql.select(TransactionUser).where(TransactionUser.user_id == user.id and TransactionUser.transaction_id == transaction.id)
+    statement = sql.select(TransactionUser).where(TransactionUser.user_id == user.id, TransactionUser.transaction_id == transaction.id)
     balance = db.session.scalar(statement).balance
     return balance
 

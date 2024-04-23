@@ -234,6 +234,7 @@ def create_app(name=__name__, testing=False):
         elif request.method == "POST":
             data = request.get_json()
             data.update({"purchaser_id": user.id, "completed": False})
+            data['amount'] = float(data['amount'])
             users = [get_user_by_username(u) for u in data['users']]
             data.pop('users')
             message = data['message']
@@ -279,6 +280,13 @@ def create_app(name=__name__, testing=False):
         db.session.commit()
         return jsonify(f"Transactions owed to {username} paid successfully."), 200
 
+    @app.route(f"{API_ROOT_PATH}/users/me/household/", methods=["GET"])
+    def household_users():
+        user = get_request_user()
+        statement = sql.select(User).where(User.household_id == user.household_id, User.id != user.id)
+        members = db.session.scalars(statement).all()
+        return jsonify([member.to_dict() for member in members])
+    
     @app.route(f"{API_ROOT_PATH}/users/me/<resource>/", methods=["GET", "POST", "DELETE"])
     def user_resource_access(resource:str):
         user = get_request_user()
@@ -308,11 +316,6 @@ def create_app(name=__name__, testing=False):
         db.session.commit()
         return jsonify(household.id), 201
 
-    @app.route(f"{API_ROOT_PATH}/users/household/<int:id>", methods=["GET"])
-    def household_users(id:int):
-        statement = sql.select(User).where(User.household_id == id)
-        members = db.session.scalars(statement).all()
-        return jsonify([member.to_dict() for member in members])
 
     @app.route("/debug/", methods=["GET"])
     def debug():
