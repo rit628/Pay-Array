@@ -1,29 +1,71 @@
 'use client'
-import { useState } from 'react'
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-
 const UserLandingPage: React.FC = () => {
-    return (
-      <div className="container">
+  const [transactions, setTransactions] = useState<Array<any>>([1, 2]);
+  const [user, setUser] = useState<any>();
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const header: any = localStorage.getItem('auth-header');
+        const response = await fetch(`${process.env.API_URL}/users/me/transactions/due/`, {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': header
+          }
+        });
+        const data = await response.json();
+        setTransactions(data);
+      } catch (error) {
+        console.error('Error fetching Transactions:', error);
+      }
+    };
+    const fetchUser = async () => {
+      try {
+        const header: any = localStorage.getItem('auth-header');
+        const response = await fetch(`${process.env.API_URL}/users/me/`, {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': header
+          }
+        });
+        const data = await response.json();
+        setUser(data);
+      } catch (error) {
+        console.error('Error fetching User:', error);
+      }
+    };
+    fetchTransactions();
+    fetchUser();
+  }, []);
+  
+ 
+  return (
+    <div className="container">
       <div className="sidebar">
-          <h1 className="helloUsername">Hello {localStorage.getItem('username')}!</h1>
-          <div className="userButtonGroup">
-            <Link href= "/pay">
+        <h1 className="helloUsername">Hello {user?.username}!</h1>
+        <h1 className="helloUsername">Hello {user?.email}!</h1>
+        <div className="userButtonGroup">
+          <Link href="/pay">
             <button className="userButton w-full">Pay</button>
-            </Link>
-            <Link href= "/request">
+          </Link>
+          <Link href="/request">
             <button className="userButton w-full">Request</button>
-            </Link>
-          </div>
+          </Link>
+        </div>
       </div>
       <div className="transactionContent">
-        <h1 className= "transactionTitle">Transactions</h1>
-          
+        <h1 className="transactionTitle">Transactions {transactions}</h1>
+        <h1 className="transactionTitle">User Information: {user?.username}</h1>
       </div>
-  </div>
-        
-      );
-    };
-  
-  export default UserLandingPage;
+    </div>
+  );
+};
+
+export default UserLandingPage;
