@@ -13,40 +13,25 @@ const Pay: React.FC = () => {
   const [householdUsers, setHouseholdUsers] = useState([]);
 
   // Function to fetch household users
-  const getHouseholdUsers = async () => {
-    try {
-      const header = localStorage.getItem("auth-header")|| '';
-      const response = await fetch(`${process.env.API_URL}/users/me/household_id`, {
-        method: "GET",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": header
-        }
-      });
-
-      const userHouseholdId = await response.json();
-
-      const response2 = await fetch(`${process.env.API_URL}/users/household/${userHouseholdId}`, {
-        method: "GET",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": header
-        }
-      });
-
-      const householdUsers = await response2.json();
-      setHouseholdUsers(householdUsers);
-    } catch (error) {
-      console.error("Error fetching household users:", error);
-    }
-  };
-
   useEffect(() => {
-    // erm
-    getHouseholdUsers();
-  }, []); 
+    const fetchHouseholdUsers = async () => {
+      const header : any = localStorage.getItem('auth-header');
+      const response = await fetch(`${process.env.API_URL}/users/me/household/`, {
+        "method": "GET",
+        "mode": "cors",
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": header
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data);
+        setHouseholdUsers(data)
+      }
+    }
+    fetchHouseholdUsers();
+  }, [])
 
   // Handle form change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -46,12 +46,10 @@ const UserLandingPage: React.FC = () => {
     fetchUser();
   }, []);
   
- 
   return (
     <div className="container">
       <div className="sidebar">
         <h1 className="helloUsername">Hello {user?.username}!</h1>
-        <h1 className="helloUsername">Hello {user?.email}!</h1>
         <div className="userButtonGroup">
           <Link href="/pay">
             <button className="userButton w-full">Pay</button>
@@ -62,8 +60,22 @@ const UserLandingPage: React.FC = () => {
         </div>
       </div>
       <div className="transactionContent">
-        <h1 className="transactionTitle">Transactions {transactions}</h1>
-        <h1 className="transactionTitle">User Information: {user?.username}</h1>
+        <h1 className="transactionTitle">Transactions:</h1>
+        <ul>
+          {transactions.map((transaction, index) => (
+            <li key={index}>
+              <div>
+                <strong>Amount:</strong> {transaction.amount}
+              </div>
+              <div>
+                <strong>Message:</strong> {transaction.message}
+              </div>
+              <div>
+                <strong>Item ID:</strong> {transaction.item_id}
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
