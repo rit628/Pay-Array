@@ -59,7 +59,7 @@ def test_make_transaction(client):
             "completed" : False,
             "message" : "apples",
             "item_id" : 1,
-            "purchaser_id" : 1
+            "purchaser" : "testUser999"
         }
     ]
 
@@ -89,7 +89,7 @@ def test_make_transaction(client):
             "completed" : False,
             "message" : "apples",
             "item_id" : 1,
-            "purchaser_id" : 1
+            "purchaser" : "testUser999"
         }
     ]
 
@@ -105,7 +105,7 @@ def test_make_transaction(client):
             "completed" : False,
             "message" : "apples",
             "item_id" : 1,
-            "purchaser_id" : 1
+            "purchaser" : "testUser999"
         }
     ]
 
@@ -165,7 +165,7 @@ def test_pay_transaction(client):
             "completed" : False,
             "message" : "apples",
             "item_id" : 1,
-            "purchaser_id" : 1
+            "purchaser" : "testUser999"
         }
     ]
 
@@ -188,7 +188,7 @@ def test_pay_transaction(client):
             "completed" : False,
             "message" : "apples",
             "item_id" : 1,
-            "purchaser_id" : 1
+            "purchaser" : "testUser999"
         }
     ]
 

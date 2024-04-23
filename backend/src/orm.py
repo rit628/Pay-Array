@@ -5,7 +5,7 @@ db = SQLAlchemy()
 
 PRIVATE_FIELDS = {"user": {"id", "salt", "password_hash"},
                   "item": {},
-                  "transaction": {}
+                  "transaction": {"purchaser_id"}
                 }
 
 class Base(db.Model):
@@ -88,5 +88,6 @@ class Transaction(Base):
     message = db.Column(db.String(1000), nullable=False, default="")
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'))
     purchaser_id = db.Column(db.Integer, nullable=False)
+    purchaser = db.Column(db.String(50), nullable=False)
     users = db.relationship('User', secondary="transaction_user", back_populates="transactions")
     

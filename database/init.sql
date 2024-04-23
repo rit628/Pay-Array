@@ -31,6 +31,7 @@ CREATE TABLE transaction (
     message VARCHAR(1000) NOT NULL DEFAULT "",
     item_id INT,
     purchaser_id INT NOT NULL,
+    purchaser VARCHAR(50) NOT NULL,
     FOREIGN KEY (item_id) REFERENCES item(id)
 );
 
