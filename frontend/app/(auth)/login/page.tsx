@@ -34,7 +34,7 @@ const LoginPage: React.FC = () => {
       });
       const header = await response.json();
       localStorage.setItem('auth-header', header);
-      localStorage.setItem('username', formData.username);
+      console.log(header);
       if (response.ok) {
         router.push("/user");
       }

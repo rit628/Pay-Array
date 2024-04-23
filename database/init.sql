@@ -12,7 +12,7 @@ CREATE TABLE user (
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     phone CHAR(10),
-    balance DECIMAL(5,2) UNSIGNED,
+    balance DECIMAL(5,2) UNSIGNED DEFAULT 0.00,
     UNIQUE(username),
     FOREIGN KEY (household_id) REFERENCES household(id)
 );
@@ -21,7 +21,6 @@ CREATE TABLE item (
     id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
     name VARCHAR(100),
     price DECIMAL(5,2) UNSIGNED,
-    purchase_link VARCHAR(2048),
     UNIQUE(name)
 );
 
@@ -29,14 +28,16 @@ CREATE TABLE transaction (
     id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
     amount DECIMAL(5,2) NOT NULL,
     completed BOOLEAN NOT NULL,
-    item_id INT NOT NULL,
-    purchaser_id INT NOT NULL
+    message VARCHAR(1000) NOT NULL DEFAULT "",
+    item_id INT,
+    purchaser_id INT NOT NULL,
+    FOREIGN KEY (item_id) REFERENCES item(id)
 );
 
 CREATE TABLE transaction_user (
     transaction_id INT NOT NULL,
     user_id INT NOT NULL,
-    balance DECIMAL(5,2) NOT NULL,
+    balance DECIMAL(5,2) NOT NULL DEFAULT 0.00,
     FOREIGN KEY (transaction_id) REFERENCES transaction(id),
     FOREIGN KEY (user_id) REFERENCES user(id)
 );

@@ -18,6 +18,56 @@ class BudgetError(Exception):
     
     def __repr__(self):
         return self.message
+    
+def levenshtein_distance(s1, s2):
+    """
+    Calculate the Levenshtein distance between two strings.
+    """
+    if len(s1) < len(s2):
+        return levenshtein_distance(s2, s1)
+
+    if len(s2) == 0:
+        return len(s1)
+
+    previous_row = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        current_row = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = previous_row[j + 1] + 1
+            deletions = current_row[j] + 1
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row.append(min(insertions, deletions, substitutions))
+        previous_row = current_row
+
+    return previous_row[-1]
+
+def fuzzy_match(query:str, choices:list[str], threshold:float=.5) -> list[tuple[str, float]] | None:
+    """
+    Find fuzzy matches from a list of choices based on a query string and a threshold.
+    """
+    matches = []
+    for choice in choices:
+        distance = levenshtein_distance(query.lower(), choice.lower())
+        similarity = 1 - (distance / max(len(query), len(choice)))
+        if similarity >= threshold:
+            matches.append((choice, similarity))
+    return sorted(matches, key=lambda x: x[1], reverse=True) if len(matches) > 0 else None
+
+def get_closest_item_id(query:str, threshold:float=.5) -> int:
+    items = Item.query.all()
+    item_dict = {i.name:i.id for i in items}
+    match = fuzzy_match(query, item_dict.keys(), threshold)
+    if not match:
+        return match
+    return item_dict[match[0][0]]  
+
+def set_item(name:str, price:float=0) -> int:
+    if len(name.split()) > 2:
+        return
+    item = Item(name=name, price=price)
+    db.session.add(item)
+    db.session.commit()
+    return item.id
 
 def get_transaction_by_id(id:int) -> Transaction:
     statement = sql.select(Transaction).where(Transaction.id == id)
@@ -43,6 +93,11 @@ def get_balance_for_transaction(user:User, transaction:Transaction) -> float:
     statement = sql.select(TransactionUser).where(TransactionUser.user_id == user.id and TransactionUser.transaction_id == transaction.id)
     balance = db.session.scalar(statement).balance
     return balance
+
+def get_transactions_due(user:User) -> list[Transaction]:
+    statement = sql.select(Transaction).join(TransactionUser).filter(TransactionUser.user_id == user.id, TransactionUser.balance > 0)
+    transactions = db.session.scalars(statement).all()
+    return transactions
 
 def calculate_money_owed_by_user(user:User) -> float:
     # Calculate the amount the user owes to others
