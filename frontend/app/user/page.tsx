@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+
 const UserLandingPage: React.FC = () => {
   const [transactions, setTransactions] = useState<Array<any>>([1, 2]);
   const [user, setUser] = useState<any>();
