@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 
@@ -76,9 +75,7 @@ const LoginPage: React.FC = () => {
                   required
                 />
               </div>
-              <Link href="/user">
               <button type="submit" className="submit-button">Login</button>
-              </Link>
             </form>
           </div>
         </div>
