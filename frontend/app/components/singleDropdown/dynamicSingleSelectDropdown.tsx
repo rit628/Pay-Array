@@ -2,20 +2,29 @@ import React, { useState } from 'react';
 import { Select, MenuItem, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
 
 interface Option {
-  id: number;
-  username: string;
+  username : string;
+  email : string;
+  household_id : number;
+  first_name : string;
+  last_name : string;
+  phone : string;
+  balance : number;
+
 }
 
 interface Props {
   options: Option[];
   label: string;
+  onSelect: (value: string | number) => void; // Callback function to handle selected value
 }
 
-const DynamicSingleSelectDropdown: React.FC<Props> = ({ options, label }) => {
-  const [selectedOption, setSelectedOption] = useState<string>(''); // selected option is a username
+const DynamicSingleSelectDropdown: React.FC<Props> = ({ options, label, onSelect }) => {
+  const [selectedOption, setSelectedOption] = useState<string | number>(''); // State type can be string or number
 
-  const handleChange = (event: SelectChangeEvent<string>) => {
-    setSelectedOption(event.target.value); 
+  const handleChange = (event: SelectChangeEvent<string | number>) => {
+    const selectedValue = event.target.value;
+    setSelectedOption(selectedValue);
+    onSelect(selectedValue); // Call the callback function with the selected option
   };
 
   return (
@@ -31,7 +40,7 @@ const DynamicSingleSelectDropdown: React.FC<Props> = ({ options, label }) => {
           {label} {/* Display the label for the dropdown */}
         </MenuItem>
         {options.map((option) => (
-          <MenuItem key={option.id} value={option.username}>
+          <MenuItem key={option.email} value={option.username}>
             {option.username}
           </MenuItem>
         ))}
