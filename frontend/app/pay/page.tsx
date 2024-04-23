@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import DynamicSingleSelectDropdown from '../components/singleDropdown/dynamicSingleSelectDropdown'; 
+import DynamicSingleSelectDropdown from '../components/userDropdown/userSelectDropdown'; 
 
 
 const Pay: React.FC = () => {
@@ -48,15 +48,20 @@ const Pay: React.FC = () => {
 
   const [selectedOption, setSelectedOption] = useState<string | number>('');
 
-  const handleSelect = (value: string | number) => {
-    setSelectedOption(value);
-  }
+  const handleSelect = (value: string | number | (string | number)[]) => {
+    if (Array.isArray(value)) {
+      console.log('multiselect error on pay');
+    } else {
+      // single-select case
+      setSelectedOption(value);
+    }
+  };
 
   return (
     <div className='container'>
       <h1 className='payReqTitle'>Let's Pay!</h1>
       <div className='payReqButtons'>
-      <DynamicSingleSelectDropdown options={householdUsers} label="Select User" onSelect={handleSelect} />
+      <DynamicSingleSelectDropdown options={householdUsers} label="Select User" onSelect={handleSelect} multiSelect={false} />
         <button className='payReqButton w-full'>Pay</button>
       </div>
     </div>
