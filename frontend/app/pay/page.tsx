@@ -1,6 +1,8 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import DynamicSingleSelectDropdown from '../components/userDropdown/userSelectDropdown'; 
+import TransactionDropdown from '../components/transactionDropdown/transactionDropdown'; 
+
 
 
 const Pay: React.FC = () => {
@@ -9,8 +11,14 @@ const Pay: React.FC = () => {
     msg: '',
   });
 
-  // State to hold household users
+  // States
   const [householdUsers, setHouseholdUsers] = useState([]);
+  const[transactions, setTransactions] = useState<any>([]);
+  const [selectedOption, setSelectedOption] = useState<string | number>('');
+  const [selectedTransaction, setSelectedTransaction] = useState<string | number>('');
+  const [transactionList, setTransactionList] = useState<any>([]);
+
+
 
   // Function to fetch household users
   useEffect(() => {
@@ -33,6 +41,27 @@ const Pay: React.FC = () => {
     fetchHouseholdUsers();
   }, [])
 
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      const header : any = localStorage.getItem('auth-header');
+      const response = await fetch(`${process.env.API_URL}/users/me/transactions/due/`, {
+        "method": "GET",
+        "mode": "cors",
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": header
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data);
+        setTransactionList(data);
+      }
+    }
+    fetchTransactions();
+
+  }, [])
+
   // Handle form change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -40,29 +69,64 @@ const Pay: React.FC = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(formData);
-    // logic
+    const header : any = localStorage.getItem("auth-header");
+    const response = await fetch(`${process.env.API_URL}/users/me/transactions/${selectedTransaction}/pay/`, {
+      "method": "POST",
+      "mode": "cors",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": header
+      },
+    });
+    const data = await response.json();
+    if (response.ok) {
+      console.log(data);
+    }
   };
 
-  const [selectedOption, setSelectedOption] = useState<string | number>('');
 
-  const handleSelect = (value: string | number | (string | number)[]) => {
+  const handleSelect = async (value: string | number | (string | number)[]) => {
     if (Array.isArray(value)) {
       console.log('multiselect error on pay');
     } else {
       // single-select case
       setSelectedOption(value);
+      const fetchFilteredTransactions = async () => {
+        if (!transactionList) {
+          return;
+        }
+        const userTransactions = transactionList.filter((transaction: { purchaser: string | number; }) => transaction.purchaser === selectedOption);
+        setTransactions(userTransactions);
+        console.log(userTransactions);
+      }
+    
+      await fetchFilteredTransactions();
     }
   };
+  const handleSelectedTransaction = (value: string | number | (string | number)[]) => {
+    if (Array.isArray(value)) {
+      console.log('multiselect error on pay');
+    } else {
+      // single-select case
+      setSelectedTransaction(value);
+    }
+  };
+
+        {/* still need to set selected transaction as paid */}
+
 
   return (
     <div className='container'>
       <h1 className='payReqTitle'>Let's Pay!</h1>
       <div className='payReqButtons'>
       <DynamicSingleSelectDropdown options={householdUsers} label="Select User" onSelect={handleSelect} multiSelect={false} />
-        <button className='payReqButton w-full'>Pay</button>
+      <TransactionDropdown options={transactions} label="Select Transaction" onSelect={handleSelectedTransaction} multiSelect={false}/>
+      {/* still need to set selected transaction as paid */}
+
+        <button className='payReqButton w-full' onClick={handleSubmit}>Pay</button>
       </div>
     </div>
   );

@@ -1,8 +1,9 @@
 'use client'
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react"; 
 
 const Household = () => {
-
+  const router = useRouter();
   const [householdId, setHouseholdId] = useState(null);
   const header : any = localStorage.getItem('auth-header');
   useEffect(() => {
@@ -16,6 +17,9 @@ const Household = () => {
         },
       });
       const householdId = await response.json();
+      if (!response.ok) {
+        router.push("/");
+      }
       setHouseholdId(householdId);
     };
     getHouseholdId();

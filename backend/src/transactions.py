@@ -94,6 +94,10 @@ def get_balance_for_transaction(user:User, transaction:Transaction) -> float:
     balance = db.session.scalar(statement).balance
     return balance
 
+def set_balance_for_transaction(user:User, transaction:Transaction, amount:float):
+    statement = sql.update(TransactionUser).values(balance=amount).where(TransactionUser.user_id == user.id, TransactionUser.transaction_id == transaction.id)
+    db.session.execute(statement)
+
 def get_transactions_due(user:User) -> list[Transaction]:
     statement = sql.select(Transaction).join(TransactionUser).filter(TransactionUser.user_id == user.id, TransactionUser.balance > 0)
     transactions = db.session.scalars(statement).all()
@@ -127,6 +131,7 @@ def pay_transaction(user:User, transaction:Transaction) -> None:
         raise InvalidFieldError("User is not a part of this transaction")
     balance = -get_balance_for_transaction(user, transaction)
     update_user_balance(user, balance)
+    set_balance_for_transaction(user, transaction, 0)
 
 def pay_all_transactions_due(user:User) -> None:
     #Allow a user to pay all of their outstanding debts
