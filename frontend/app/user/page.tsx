@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Card from '@mui/material/Card' 
 
 
 const UserLandingPage: React.FC = () => {
-  const [transactions, setTransactions] = useState<Array<any>>([1, 2]);
+  const [transactions, setTransactions] = useState<Array<any>>([]);
+  const [duetransactions, setDueTransactions] = useState<Array<any>>([]);
   const [user, setUser] = useState<any>();
   const router = useRouter();
 
@@ -55,6 +57,43 @@ const UserLandingPage: React.FC = () => {
         if (header === null) {
           router.push("/");
         }
+        const response2 = await fetch(`${process.env.API_URL}/users/me/username/`, {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': header
+          }
+        });
+        const username = await response2.json();
+        const response = await fetch(`${process.env.API_URL}/users/me/transactions/`, {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': header
+          }
+        });
+
+        const data = await response.json();
+        console.log(data);
+        let t2 : any = []
+        data.forEach(t => {
+          if (t.purchaser === username) {
+            t2.push(t)
+          }
+        });
+        setTransactions(t2);
+      } catch (error) {
+        console.error('Error fetching Transactions:', error);
+      }
+    };
+    const fetchDueTransactions = async () => {
+      try {
+        const header: any = localStorage.getItem('auth-header');
+        if (header === null) {
+          router.push("/");
+        }
         const response = await fetch(`${process.env.API_URL}/users/me/transactions/due/`, {
           method: 'GET',
           mode: 'cors',
@@ -65,7 +104,7 @@ const UserLandingPage: React.FC = () => {
         });
         const data = await response.json();
         console.log(data);
-        setTransactions(data);
+        setDueTransactions(data);
       } catch (error) {
         console.error('Error fetching Transactions:', error);
       }
@@ -89,8 +128,9 @@ const UserLandingPage: React.FC = () => {
         console.error('Error fetching User:', error);
       }
     };
-    fetchTransactions();
     fetchUser();
+    fetchDueTransactions();
+    fetchTransactions();
   }, []);
   
   return (
@@ -215,10 +255,29 @@ const UserLandingPage: React.FC = () => {
         </div>
       </div>
       <div className="transactionContent">
-        <h1 className="transactionTitle">Transactions:</h1>
+        <h1 className="transactionTitle">Payments You Owe to Others</h1>
+        <ul>
+          {duetransactions.map((duetransaction, index) => (
+            <Card className="card" style={{ backgroundColor: '#ECB3AC' }}>
+            <li key={index} style={{color: 'black'}}>
+              <div>
+                <strong>Amount:</strong> {duetransaction.amount}
+              </div>
+              <div>
+                <strong>Message:</strong> {duetransaction.message}
+              </div>
+              <div>
+                <strong>Item ID:</strong> {duetransaction.item_id}
+              </div>
+            </li>
+            </Card>
+          ))}
+        </ul>
+        <h1 className="transactionTitle">Requests to Others</h1>
         <ul>
           {transactions.map((transaction, index) => (
-            <li key={index}>
+            <Card className="card" style={{ backgroundColor: '#CDE8B0' }}>
+            <li key={index} style={{color: 'black'}}>
               <div>
                 <strong>Amount:</strong> {transaction.amount}
               </div>
@@ -229,6 +288,7 @@ const UserLandingPage: React.FC = () => {
                 <strong>Item ID:</strong> {transaction.item_id}
               </div>
             </li>
+            </Card>
           ))}
         </ul>
       </div>
