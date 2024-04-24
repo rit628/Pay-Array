@@ -19,7 +19,7 @@ const SignUpPage: React.FC = () => {
   
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      console.log(formData);
+      
       if (formData.password === formData.confirmPassword) {
         const userData = {
           "email": formData.email,
@@ -36,7 +36,7 @@ const SignUpPage: React.FC = () => {
         })
 
         let data = await response.json();
-        console.log(data);
+        
         if (!response.ok) {
           return;
         }

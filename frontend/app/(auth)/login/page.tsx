@@ -19,7 +19,7 @@ const LoginPage: React.FC = () => {
     // headers
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      console.log(formData);
+      
       const userData = {
         "username": formData.username,
         "password": formData.password
@@ -34,7 +34,7 @@ const LoginPage: React.FC = () => {
       });
       const header = await response.json();
       localStorage.setItem('auth-header', header);
-      console.log(header);
+      
       if (response.ok) {
         router.push("/user");
       }

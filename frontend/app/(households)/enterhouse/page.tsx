@@ -18,7 +18,7 @@ const EnterHouse: React.FC = () => {
     
       const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(formData);
+        
         const header : any = localStorage.getItem('auth-header');
         const response = await fetch(`${process.env.API_URL}/users/me/household_id/`, {
           "method": "POST",
