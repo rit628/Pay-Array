@@ -20,9 +20,9 @@ const OpenScreen = () => {
       <h2>Features</h2>
       <div className="info">
       <Card className="card">
-          <p>something about being able to split with roommates</p>
+          <p>Easily split expenses with your rooommates using PayArray! With us, you'll be able to easily create households and evenly request and pay costs between your group members hassle-free.</p>
       </Card>
-      <Card className="card">easy way to connect with roommates</Card>
+      <Card className="card">Managing your shared expenses has never been easier or safer with PayArray. Keep track of your household costs with us!</Card>
       </div>
     </div>
   );
