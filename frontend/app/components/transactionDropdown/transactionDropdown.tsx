@@ -3,10 +3,9 @@ import { Select, MenuItem, FormControl, InputLabel, SelectChangeEvent } from '@m
 
 interface Option {
  //   transaction objects
-  price: number
-  msg : string
-  transactionId : number
-  username : string
+  amount: number
+  message : string
+  id : number
 }
 
 interface Props {
@@ -39,8 +38,8 @@ const TransactionDropdown: React.FC<Props> = ({ options, label, onSelect, multiS
           {label}
         </MenuItem>
         {options.map((option) => (
-          <MenuItem key={option.transactionId} value={option.transactionId}>
-                {`${option.price} - ${option.msg}`}
+          <MenuItem key={option.id} value={option.id}>
+                {`${option.amount} - ${option.message}`}
 
           </MenuItem>
         ))}

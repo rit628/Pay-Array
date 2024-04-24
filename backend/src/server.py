@@ -176,9 +176,14 @@ def create_app(name=__name__, testing=False):
             return jsonify(user_dict), 200
         elif request.method == "POST":
             data = request.get_json()
-            if "password" in data:  # Password should be updated seperately
-                data.pop("password")
             validate_user_data(data)
+            if "password" in data and "password" is not None:
+                password = data["password"]
+                password_hash, salt = hash_password(password)
+                user.password_hash = password_hash
+                user.salt = salt
+                data.pop("password")
+                
             for field, value in data.items():
                 user.set_attr(field, value)
             db.session.commit()
