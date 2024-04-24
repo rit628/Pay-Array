@@ -27,7 +27,7 @@ const JoinHouse = () => {
         <title>Join Household | PayArray</title>
       </Head>
       <h1>Join a Household</h1>
-      <p>there is some quick blurb here</p>
+      <p>Split costs hassle-free!</p>
       <div className="button-container">
         {!householdId && <Button className="submit-button" onClick={createHousehold}>Create a Household</Button>}
         {householdId && <div>Your household id is: {householdId}.</div>}

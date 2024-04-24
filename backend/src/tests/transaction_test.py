@@ -101,7 +101,7 @@ def test_make_transaction(client):
     assert response.get_json() == [
         {   
             "id" : 1,
-            "amount" : '10.10',
+            "amount" : '5.05',
             "completed" : False,
             "message" : "apples",
             "item_id" : 1,

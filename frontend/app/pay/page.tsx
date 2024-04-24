@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import DynamicSingleSelectDropdown from '../components/userDropdown/userSelectDropdown'; 
 import TransactionDropdown from '../components/transactionDropdown/transactionDropdown'; 
+import { useRouter } from 'next/navigation';
 
 
 
 const Pay: React.FC = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     payTo: '',
     msg: '',
@@ -17,6 +19,7 @@ const Pay: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<string | number>('');
   const [selectedTransaction, setSelectedTransaction] = useState<string | number>('');
   const [transactionList, setTransactionList] = useState<any>([]);
+  const [brokeFlag, setBrokeFlag] = useState(false);
 
 
 
@@ -73,17 +76,20 @@ const Pay: React.FC = () => {
     e.preventDefault();
     console.log(formData);
     const header : any = localStorage.getItem("auth-header");
-    const response = await fetch(`${process.env.API_URL}/users/me/transactions/${selectedTransaction}/pay/`, {
-      "method": "POST",
-      "mode": "cors",
-      "headers": {
-        "Content-Type": "application/json",
-        "Authorization": header
-      },
-    });
-    const data = await response.json();
-    if (response.ok) {
+    try {
+      const response = await fetch(`${process.env.API_URL}/users/me/transactions/${selectedTransaction}/pay/`, {
+        "method": "POST",
+        "mode": "cors",
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": header
+        },
+      });
+      const data = await response.json();
       console.log(data);
+      router.push("/user");
+    } catch (error) {
+      setBrokeFlag(true);
     }
   };
 
@@ -98,7 +104,14 @@ const Pay: React.FC = () => {
         if (!transactionList) {
           return;
         }
-        const userTransactions = transactionList.filter((transaction: { purchaser: string | number; }) => transaction.purchaser === selectedOption);
+        let userTransactions : any = [];
+
+        transactionList.forEach(transaction => {
+          if (transaction.purchaser === value) {
+            userTransactions.push(transaction);
+          }
+        });
+        // const userTransactions = transactionList.filter((transaction: { purchaser: string | number; }) => transaction.purchaser === selectedOption);
         setTransactions(userTransactions);
         console.log(userTransactions);
       }
@@ -121,11 +134,12 @@ const Pay: React.FC = () => {
   return (
     <div className='container'>
       <h1 className='payReqTitle'>Let's Pay!</h1>
-      <div className='payReqButtons'>
+      <div className='payReqButtons' style={{width: '30%'}}>
       <DynamicSingleSelectDropdown options={householdUsers} label="Select User" onSelect={handleSelect} multiSelect={false} />
       <TransactionDropdown options={transactions} label="Select Transaction" onSelect={handleSelectedTransaction} multiSelect={false}/>
       {/* still need to set selected transaction as paid */}
 
+        {brokeFlag && <div>You Broke!</div>}
         <button className='payReqButton w-full' onClick={handleSubmit}>Pay</button>
       </div>
     </div>
