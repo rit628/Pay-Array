@@ -4,12 +4,12 @@ import sqlalchemy as sql
 import os
 import re
 from .auth import *
+from .transactions import *
 from xxhash import xxh32
 import redis
 from .orm import db, User, Item, Transaction, Household, user_preference
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound
-from .transactions import *
 
 def create_app(name=__name__, testing=False):
     dupe_error_msg = re.compile(R"Duplicate entry \'([^\']*)\'")
@@ -177,7 +177,7 @@ def create_app(name=__name__, testing=False):
         elif request.method == "POST":
             data = request.get_json()
             validate_user_data(data)
-            if "password" in data and "password" is not None:
+            if "password" in data and data["password"] is not None:
                 password = data["password"]
                 password_hash, salt = hash_password(password)
                 user.password_hash = password_hash
@@ -326,14 +326,6 @@ def create_app(name=__name__, testing=False):
         db.session.add(household)
         db.session.commit()
         return jsonify(household.id), 201
-
-
-    @app.route("/debug/", methods=["GET"])
-    def debug():
-        statement = sql.select(User)
-        users = db.session.scalars(statement).all()
-        users = [i.to_dict() for i in users]
-        return users
 
     return app
 
