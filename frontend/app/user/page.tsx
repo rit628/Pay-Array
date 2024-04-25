@@ -29,7 +29,7 @@ const UserLandingPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(userData);
+    
     if (userData.confirmPassword != userData.password) {
       return;
     }
@@ -47,7 +47,7 @@ const UserLandingPage: React.FC = () => {
     })
 
     let data = await response.json();
-    console.log(data);
+    
   };
 
   useEffect(() => {
@@ -76,7 +76,7 @@ const UserLandingPage: React.FC = () => {
         });
 
         const data = await response.json();
-        console.log(data);
+        
         let t2 : any = []
         data.forEach(t => {
           if (t.purchaser === username) {
@@ -103,7 +103,7 @@ const UserLandingPage: React.FC = () => {
           }
         });
         const data = await response.json();
-        console.log(data);
+        
         setDueTransactions(data);
       } catch (error) {
         console.error('Error fetching Transactions:', error);
@@ -122,7 +122,7 @@ const UserLandingPage: React.FC = () => {
         });
         const data = await response.json();
         setUserData(data);
-        console.log(data);
+        
         setUser(data);
       } catch (error) {
         console.error('Error fetching User:', error);

@@ -24,7 +24,7 @@ const Household = () => {
           }
         });
         const data = await response.json();
-        console.log(data);
+        
         setHouseholdMembers(data);
       } catch (error) {
         console.error('Error fetching Household members:', error);

@@ -1,6 +1,7 @@
 FROM mysql:8.3.0
 
 COPY ./database/init.sql /docker-entrypoint-initdb.d/
+COPY ./database/example_db.sql /
 
 ARG DATABASE_NAME_TEST
 ARG DATABASE_NAME_PRODUCTION

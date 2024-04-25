@@ -27,7 +27,7 @@ const Pay: React.FC = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        console.log(data);
+        
         setHouseholdUsers(data)
       }
     }
@@ -51,7 +51,7 @@ const Pay: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     formData.users = debtUsers;
-    console.log(formData);
+    
     const header : any = localStorage.getItem('auth-header');
     const response = await fetch(`${process.env.API_URL}/users/me/transactions/`, {
       "method": "POST",

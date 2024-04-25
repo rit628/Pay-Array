@@ -37,7 +37,7 @@ const Pay: React.FC = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        console.log(data);
+        
         setHouseholdUsers(data)
       }
     }
@@ -57,7 +57,7 @@ const Pay: React.FC = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        console.log(data);
+        
         setTransactionList(data);
       }
     }
@@ -74,7 +74,7 @@ const Pay: React.FC = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+    
     const header : any = localStorage.getItem("auth-header");
     try {
       const response = await fetch(`${process.env.API_URL}/users/me/transactions/${selectedTransaction}/pay/`, {
@@ -86,7 +86,7 @@ const Pay: React.FC = () => {
         },
       });
       const data = await response.json();
-      console.log(data);
+      
       router.push("/user");
     } catch (error) {
       setBrokeFlag(true);
@@ -113,7 +113,7 @@ const Pay: React.FC = () => {
         });
         // const userTransactions = transactionList.filter((transaction: { purchaser: string | number; }) => transaction.purchaser === selectedOption);
         setTransactions(userTransactions);
-        console.log(userTransactions);
+        
       }
     
       await fetchFilteredTransactions();
